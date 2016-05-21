@@ -1,0 +1,35 @@
+{% for item in groups.all %}
+REPLACE INTO Hosts(HostName) VALUES ('{{ hostvars[item].inventory_hostname }}');
+{% endfor %}
+{% for item in groups.all %}
+{%   for grp in hostvars[item].group_names %}
+REPLACE INTO Groups(GroupName) VALUES ('{{ grp }}');
+{%   endfor %}
+{% endfor %}
+{% for item in groups.all %}
+REPLACE INTO HostDetails(HostId,AnsibleSSHHost,HostArchitecture,HostBIOSDate,HostBIOSVersion,HostDistribution, \
+HostDistributionRelease,HostDistributionVersion,HostFQDN,HostKernel,HostSystemVendor,HostTimeZone,HostVirtualizationType, \
+HostInterface,HostInterfaceGateway,HostInterfaceMAC,HostInterfaceNetmask,HostInterfaceAddress,HostProcessor, \
+HostProcessorCores,HostProcessorCount,HostMemFreeMB,HostMemTotalMB,HostOSFamily,HostProductName,HostSwapFree,HostSwapTotal) \
+VALUES( (SELECT HostId FROM Hosts WHERE HostName='{{ hostvars[item].inventory_hostname }}'), \
+'{{ hostvars[item].ansible_ssh_host }}','{{ hostvars[item].ansible_architecture }}','{{ hostvars[item].ansible_bios_date }}', \
+'{{ hostvars[item].ansible_bios_version }}','{{ hostvars[item].ansible_distribution }}', \
+'{{ hostvars[item].ansible_distribution_release }}','{{ hostvars[item].ansible_distribution_version }}', \
+'{{ hostvars[item].ansible_fqdn }}','{{ hostvars[item].ansible_kernel }}','{{ hostvars[item].ansible_system_vendor }}', \
+'{{ hostvars[item].ansible_date_time.tz }}','{{ hostvars[item].ansible_virtualization_type }}', \
+'{{ hostvars[item].ansible_default_ipv4.interface }}','{{ hostvars[item].ansible_default_ipv4.gateway }}', \
+'{{ hostvars[item].ansible_default_ipv4.macaddress }}','{{ hostvars[item].ansible_default_ipv4.netmask }}', \
+'{{ hostvars[item].ansible_default_ipv4.address }}','{{ hostvars[item].ansible_processor|join }}', \
+'{{ hostvars[item].ansible_processor_cores }}','{{ hostvars[item].ansible_processor_count}}','{{ hostvars[item].ansible_memfree_mb }}', \
+'{{ hostvars[item].ansible_memtotal_mb }}','{{ hostvars[item].ansible_os_family }}','{{ hostvars[item].ansible_product_name }}', \
+'{{ hostvars[item].ansible_swapfree_mb }}','{{ hostvars[item].ansible_swaptotal_mb }}');
+{% endfor %}
+{% for item in groups.all %}
+{%   for grp in hostvars[item].group_names %}
+REPLACE INTO HostGroups (GroupId,GroupName,HostId,HostName) \
+VALUES ( (SELECT GroupId FROM Groups WHERE GroupName='{{ grp }}'), \
+(SELECT GroupName FROM Groups WHERE GroupName='{{ grp }}'), \
+(SELECT HostId FROM Hosts Where HostName='{{ hostvars[item].inventory_hostname }}'), \
+(SELECT HostName FROM Hosts Where HostName='{{ hostvars[item].inventory_hostname }}') );
+{%   endfor %}
+{% endfor %}

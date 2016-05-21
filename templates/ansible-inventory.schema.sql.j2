@@ -1,0 +1,198 @@
+-- MySQL dump 10.15  Distrib 10.0.25-MariaDB, for debian-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: ansible_inventory
+-- ------------------------------------------------------
+-- Server version	10.0.25-MariaDB-1~trusty
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `AnsiblePlaybooks`
+--
+
+DROP TABLE IF EXISTS `AnsiblePlaybooks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `AnsiblePlaybooks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(255) NOT NULL,
+  `Description` varchar(255) DEFAULT NULL,
+  `Path` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Name` (`Name`),
+  UNIQUE KEY `Path` (`Path`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `GroupContact`
+--
+
+DROP TABLE IF EXISTS `GroupContact`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `GroupContact` (
+  `ContactId` int(11) NOT NULL AUTO_INCREMENT,
+  `ContactName` varchar(255) NOT NULL,
+  `ContactEmail` varchar(255) NOT NULL,
+  `ContactPhone` varchar(255) NOT NULL,
+  `ContactCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `GroupId` int(11) NOT NULL,
+  PRIMARY KEY (`ContactId`),
+  UNIQUE KEY `ContactName` (`ContactName`),
+  UNIQUE KEY `ContactEmail` (`ContactEmail`),
+  KEY `GroupId` (`GroupId`),
+  CONSTRAINT `GroupContact_ibfk_1` FOREIGN KEY (`GroupId`) REFERENCES `Groups` (`GroupId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `GroupVars`
+--
+
+DROP TABLE IF EXISTS `GroupVars`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `GroupVars` (
+  `VarsId` int(11) NOT NULL AUTO_INCREMENT,
+  `VarName` varchar(255) NOT NULL,
+  `VarDescription` varchar(255) DEFAULT NULL,
+  `VarReference` varchar(255) NOT NULL,
+  `VarSet` varchar(255) NOT NULL,
+  `VarValue` varchar(255) NOT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `GroupId` int(11) NOT NULL,
+  PRIMARY KEY (`VarsId`),
+  UNIQUE KEY `VarName` (`VarName`),
+  KEY `GroupId` (`GroupId`),
+  CONSTRAINT `GroupVars_ibfk_1` FOREIGN KEY (`GroupId`) REFERENCES `Groups` (`GroupId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Groups`
+--
+
+DROP TABLE IF EXISTS `Groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Groups` (
+  `GroupId` int(11) NOT NULL AUTO_INCREMENT,
+  `GroupName` varchar(255) NOT NULL,
+  `GroupDescription` varchar(255) DEFAULT NULL,
+  `GroupDTAP` char(1) DEFAULT '',
+  `GroupCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`GroupId`),
+  UNIQUE KEY `GroupName` (`GroupName`)
+) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `HostDetails`
+--
+
+DROP TABLE IF EXISTS `HostDetails`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `HostDetails` (
+  `HostDetailsId` int(11) NOT NULL AUTO_INCREMENT,
+  `HostArchitecture` varchar(255) DEFAULT NULL,
+  `HostBIOSDate` varchar(255) DEFAULT NULL,
+  `HostBIOSVersion` varchar(255) DEFAULT NULL,
+  `HostDistribution` varchar(255) DEFAULT NULL,
+  `HostDistributionRelease` varchar(255) DEFAULT NULL,
+  `HostDistributionVersion` varchar(255) DEFAULT NULL,
+  `HostFQDN` varchar(255) DEFAULT NULL,
+  `HostHardDrive` varchar(255) DEFAULT NULL,
+  `HostHardDrivePartions` varchar(255) DEFAULT NULL,
+  `HostHardDriveSize` varchar(255) DEFAULT NULL,
+  `HostInterface` varchar(255) DEFAULT NULL,
+  `HostInterfaceAddress` varchar(255) DEFAULT NULL,
+  `HostInterfaceGateway` varchar(255) DEFAULT NULL,
+  `HostInterfaceMAC` varchar(255) DEFAULT NULL,
+  `HostInterfaceNetmask` varchar(255) DEFAULT NULL,
+  `HostInterfaces` varchar(255) DEFAULT NULL,
+  `HostKernel` varchar(255) DEFAULT NULL,
+  `HostMemFreeMB` int(11) DEFAULT NULL,
+  `HostMemTotalMB` int(11) DEFAULT NULL,
+  `HostMounts` varchar(255) DEFAULT NULL,
+  `HostOSFamily` varchar(255) DEFAULT NULL,
+  `HostProcessor` varchar(255) DEFAULT NULL,
+  `HostProcessorCores` int(11) DEFAULT NULL,
+  `HostProcessorCount` int(11) DEFAULT NULL,
+  `HostProductName` varchar(255) DEFAULT NULL,
+  `HostSwapFree` int(11) DEFAULT NULL,
+  `HostSwapTotal` int(11) DEFAULT NULL,
+  `HostSystemVendor` varchar(255) DEFAULT NULL,
+  `HostTimeZone` varchar(255) DEFAULT NULL,
+  `HostVirtualizationType` varchar(255) DEFAULT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `HostId` int(11) DEFAULT NULL,
+  `AnsibleSSHHost` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`HostDetailsId`),
+  UNIQUE KEY `HostFQDN` (`HostFQDN`),
+  UNIQUE KEY `HostId` (`HostId`),
+  CONSTRAINT `HostDetails_ibfk_1` FOREIGN KEY (`HostId`) REFERENCES `Hosts` (`HostId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `HostGroups`
+--
+
+DROP TABLE IF EXISTS `HostGroups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `HostGroups` (
+  `HostGroupId` int(11) NOT NULL AUTO_INCREMENT,
+  `GroupId` int(11) NOT NULL,
+  `GroupName` varchar(255) NOT NULL,
+  `HostId` int(11) NOT NULL,
+  `HostName` varchar(255) NOT NULL,
+  PRIMARY KEY (`HostGroupId`),
+  UNIQUE KEY `HostId` (`HostId`,`GroupId`),
+  KEY `GroupId` (`GroupId`),
+  CONSTRAINT `HostGroups_ibfk_1` FOREIGN KEY (`GroupId`) REFERENCES `Groups` (`GroupId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `HostGroups_ibfk_2` FOREIGN KEY (`HostId`) REFERENCES `Hosts` (`HostId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Hosts`
+--
+
+DROP TABLE IF EXISTS `Hosts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Hosts` (
+  `HostId` int(11) NOT NULL AUTO_INCREMENT,
+  `HostName` varchar(255) NOT NULL,
+  `HostDescription` varchar(255) DEFAULT NULL,
+  `HostCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`HostId`),
+  UNIQUE KEY `HostName` (`HostName`)
+) ENGINE=InnoDB AUTO_INCREMENT=134 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-05-21 16:50:32

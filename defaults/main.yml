@@ -1,0 +1,4 @@
+---
+# defaults file for ansible-inventory
+inventory_db_name: 'ansible_inventory'  #Define the Inventory DB Name
+inventory_db_host: 'node0'  #Define the inventory_hostname in which the Inventory DB is to reside
