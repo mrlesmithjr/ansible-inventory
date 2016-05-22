@@ -195,4 +195,15 @@ CREATE TABLE `Hosts` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
+CREATE OR REPLACE VIEW `inventory`
+AS SELECT
+   `h`.`HostName` AS `HostName`,
+   `hd`.`AnsibleSSHHost` AS `AnsibleSSHHost`,
+   `hg`.`GroupName` AS `GroupName`,
+   `hd`.`HostDistribution` AS `HostDistribution`,
+   `hd`.`HostDistributionRelease` AS `HostDistributionRelease`,
+   `hd`.`HostDistributionVersion` AS `HostDistributionVersion`,
+   `hd`.`LastUpdateTime` AS `LastUpdateTime`
+FROM ((`Hosts` `h` join `HostDetails` `hd` on((`h`.`HostId` = `hd`.`HostId`))) join `HostGroups` `hg` on((`hd`.`HostId` = `hg`.`HostId`))) order by `h`.`HostName`;
+
 -- Dump completed on 2016-05-21 16:50:32
