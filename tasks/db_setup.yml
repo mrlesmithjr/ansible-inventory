@@ -32,3 +32,18 @@
     state: "touch"
   when: >
         inventory_db_schema_imported.changed
+
+- name: db_setup | Adding Inventory DB User
+  mysql_user:
+    name: "{{ inventory_db_user }}"
+    password: "{{ inventory_db_password }}"
+    priv: "{{ inventory_db_name }}.*:ALL,GRANT"
+    state: "present"
+
+- name: db_setup | Allowing DB Access from Hosts
+  mysql_user:
+    host: "{{ item }}"
+    name: "{{ inventory_db_user }}"
+    password: "{{ inventory_db_password }}"
+    state: "present"
+  with_items: '{{ inventory_db_host_access }}'

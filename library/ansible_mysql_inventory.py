@@ -16,11 +16,11 @@ except ImportError:
 # Define Vars
 db_host = 'localhost'
 db_name = 'ansible_inventory'
-db_pass = 'root'
+db_pass = 'ansible'
 db_query = 'SELECT HostName,AnsibleSSHHost,HostDistribution,HostDistributionRelease,HostDistributionVersion,GroupName FROM inventory'
 #db_query = 'SELECT * FROM inventory'
 db_table = 'inventory'
-db_user = 'root'
+db_user = 'ansible'
 
 # Setup Connection
 con = MySQLdb.connect(db_host, db_user, db_pass, db_name);
