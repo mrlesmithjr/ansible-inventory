@@ -27,9 +27,10 @@ class DatetimeEncoder(json.JSONEncoder):
 
 # Setup arguments
 parser = argparse.ArgumentParser(description='Ansible Inventory...')
-parser.add_argument('-F','--function', help='Function to Execute, [default: all], valid choices: [groups | hosts | all | queryhost]',default='all',required=False)
+parser.add_argument('-F','--function', help='Function to Execute, [default: all], valid choices: [groups | hosts | all | querygroup | queryhost]',default='all',required=False)
 parser.add_argument('-H','--host', help='Database Host, [default: 127.0.0.1]',default='127.0.0.1',required=False)
 parser.add_argument('-P','--password', help='Database Password',required=True)
+parser.add_argument('-QG','--querygroup', help='Query Group, Define Group to Query',required=False)
 parser.add_argument('-QH','--queryhost', help='Query Host, Define Host to Query',required=False)
 parser.add_argument('-U','--user', help='Database User',required=True)
 args = parser.parse_args()
@@ -44,8 +45,10 @@ def all_groups():
     cur = con.cursor()
     cur.execute(db_query)
     rows = cur.fetchall()
-    for row in rows:
-        print(json.dumps(row))
+    results = []
+    for GroupName in rows:
+        results.append({'groups': GroupName})
+    print(json.dumps(results))
     cur.close()
     con.close()
 
@@ -55,19 +58,39 @@ def all_hosts():
     cur = con.cursor()
     cur.execute(db_query)
     rows = cur.fetchall()
-    for row in rows:
-        print(json.dumps(row))
+    results = []
+    for HostName in rows:
+        results.append({'host': HostName})
+    print(json.dumps(results))
     cur.close()
     con.close()
 
 def all_inventory():
-    db_query = 'SELECT HostName,AnsibleSSHHost,HostDistribution,HostDistributionRelease,HostDistributionVersion,GroupName FROM inventory'
+    db_query = 'SELECT HostName,AnsibleSSHHost,HostDistribution,HostDistributionRelease,HostDistributionVersion,GroupName \
+    FROM inventory'
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
     cur = con.cursor()
     cur.execute(db_query)
     rows = cur.fetchall()
-    for row in rows:
-        print(json.dumps(row))
+    results = []
+    for HostName, AnsibleSSHHost, HostDistribution, HostDistributionRelease, HostDistributionVersion, GroupName in rows:
+        results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost, 'ansible_distribution': HostDistribution, \
+        'ansible_distribution_release': HostDistributionRelease, 'ansible_distribution_version': HostDistributionVersion, \
+        'groups': GroupName})
+    print(json.dumps(results))
+    cur.close()
+    con.close()
+
+def query_group():
+    db_query = ('SELECT HostName,AnsibleSSHHost FROM inventory WHERE GroupName="%s" ORDER BY HostName' %(args.querygroup))
+    con = MySQLdb.connect(args.host, args.user, args.password, db_name);
+    cur = con.cursor()
+    cur.execute(db_query)
+    rows = cur.fetchall()
+    results = []
+    for HostName, AnsibleSSHHost in rows:
+        results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost})
+    print(json.dumps(results))
     cur.close()
     con.close()
 
@@ -77,8 +100,10 @@ def query_host():
     cur = con.cursor()
     cur.execute(db_query)
     rows = cur.fetchall()
-    for HostName, AnsibleSSHHost, GroupName in cur:
-        print(json.dumps({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost, 'groups': GroupName}))
+    results = []
+    for HostName, AnsibleSSHHost, GroupName in rows:
+        results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost, 'groups': GroupName})
+    print(json.dumps(results))
     cur.close()
     con.close()
 
@@ -91,3 +116,5 @@ elif args.function == "hosts":
     all_hosts()
 elif args.function == "queryhost":
     query_host()
+elif args.function == "querygroup":
+    query_group()
