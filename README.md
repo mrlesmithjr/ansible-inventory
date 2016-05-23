@@ -131,7 +131,7 @@ python library/ansible_inventory.py -U ansible -P ansible -F querygroup -QG test
 ````
 ["inventory", {"ansible_ssh_host": "172.28.128.22", "host": "node1"}, {"ansible_ssh_host": "172.28.128.23", "host": "node2"}, {"ansible_ssh_host": "172.28.128.24", "host": "node3"}]
 ````
-Query a specifi host...
+Query a specific host...
 ````
 python library/ansible_inventory.py -U ansible -P ansible -F queryhost -QH node1
 ````
