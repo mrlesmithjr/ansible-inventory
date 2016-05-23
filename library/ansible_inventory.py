@@ -121,7 +121,7 @@ def query_host():
     results.append('inventory')
     for HostName, AnsibleSSHHost, GroupName in rows:
         results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost, 'groups': GroupName})
-    print(json.dumps(results))
+    print(json.dumps(results, sort_keys=True))
     cur.close()
     con.close()
 
