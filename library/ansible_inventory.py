@@ -82,7 +82,7 @@ def all_inventory():
         results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost, 'ansible_distribution': HostDistribution, \
         'ansible_distribution_release': HostDistributionRelease, 'ansible_distribution_version': HostDistributionVersion, \
         'groups': GroupName})
-    print(json.dumps(results))
+    print(json.dumps(results, sort_keys=True))
     cur.close()
     con.close()
 
