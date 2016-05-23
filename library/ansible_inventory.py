@@ -39,7 +39,7 @@ db_name = 'ansible_inventory'
 
 # Defined functions
 def all_groups():
-    db_query = 'SELECT GroupName FROM inventory'
+    db_query = 'SELECT DISTINCT GroupName FROM inventory'
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
     cur = con.cursor()
     cur.execute(db_query)
@@ -50,7 +50,7 @@ def all_groups():
     con.close()
 
 def all_hosts():
-    db_query = 'SELECT HostName FROM inventory'
+    db_query = 'SELECT DISTINCT HostName FROM inventory'
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
     cur = con.cursor()
     cur.execute(db_query)
