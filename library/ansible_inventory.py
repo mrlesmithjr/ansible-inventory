@@ -46,8 +46,10 @@ def all_groups():
     cur.execute(db_query)
     rows = cur.fetchall()
     results = []
-    for GroupName in rows:
-        results.append({'groups': GroupName})
+    results.append('inventory')
+    results.append('groups')
+    for row in rows:
+        results.append(row)
     print(json.dumps(results))
     cur.close()
     con.close()
@@ -59,8 +61,10 @@ def all_hosts():
     cur.execute(db_query)
     rows = cur.fetchall()
     results = []
-    for HostName in rows:
-        results.append({'host': HostName})
+    results.append('inventory')
+    results.append('hosts')
+    for row in rows:
+        results.append(row)
     print(json.dumps(results))
     cur.close()
     con.close()
@@ -73,6 +77,7 @@ def all_inventory():
     cur.execute(db_query)
     rows = cur.fetchall()
     results = []
+    results.append('inventory')
     for HostName, AnsibleSSHHost, HostDistribution, HostDistributionRelease, HostDistributionVersion, GroupName in rows:
         results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost, 'ansible_distribution': HostDistribution, \
         'ansible_distribution_release': HostDistributionRelease, 'ansible_distribution_version': HostDistributionVersion, \
@@ -88,6 +93,7 @@ def query_group():
     cur.execute(db_query)
     rows = cur.fetchall()
     results = []
+    results.append('inventory')
     for HostName, AnsibleSSHHost in rows:
         results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost})
     print(json.dumps(results))
@@ -101,6 +107,7 @@ def query_host():
     cur.execute(db_query)
     rows = cur.fetchall()
     results = []
+    results.append('inventory')
     for HostName, AnsibleSSHHost, GroupName in rows:
         results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost, 'groups': GroupName})
     print(json.dumps(results))
