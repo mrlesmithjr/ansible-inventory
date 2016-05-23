@@ -40,10 +40,10 @@ db_name = 'ansible_inventory'
 
 # Defined functions
 def all_groups():
-    db_query = 'SELECT DISTINCT GroupName FROM inventory'
+    sql = 'SELECT DISTINCT GroupName FROM inventory'
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
     cur = con.cursor()
-    cur.execute(db_query)
+    cur.execute(sql)
     rows = cur.fetchall()
     results = []
     results.append('inventory')
@@ -55,10 +55,10 @@ def all_groups():
     con.close()
 
 def all_hosts():
-    db_query = 'SELECT DISTINCT HostName FROM inventory'
+    sql = 'SELECT DISTINCT HostName FROM inventory'
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
     cur = con.cursor()
-    cur.execute(db_query)
+    cur.execute(sql)
     rows = cur.fetchall()
     results = []
     results.append('inventory')
@@ -70,11 +70,11 @@ def all_hosts():
     con.close()
 
 def all_inventory():
-    db_query = 'SELECT HostName,AnsibleSSHHost,HostDistribution,HostDistributionRelease,HostDistributionVersion,GroupName \
+    sql = 'SELECT HostName,AnsibleSSHHost,HostDistribution,HostDistributionRelease,HostDistributionVersion,GroupName \
     FROM inventory'
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
     cur = con.cursor()
-    cur.execute(db_query)
+    cur.execute(sql)
     rows = cur.fetchall()
     results = []
     results.append('inventory')
@@ -87,10 +87,10 @@ def all_inventory():
     con.close()
 
 def query_group():
-    db_query = ('SELECT HostName,AnsibleSSHHost FROM inventory WHERE GroupName="%s" ORDER BY HostName' %(args.querygroup))
+    sql = ('SELECT HostName,AnsibleSSHHost FROM inventory WHERE GroupName="%s" ORDER BY HostName' %(args.querygroup))
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
     cur = con.cursor()
-    cur.execute(db_query)
+    cur.execute(sql)
     rows = cur.fetchall()
     results = []
     results.append('inventory')
@@ -101,10 +101,10 @@ def query_group():
     con.close()
 
 def query_host():
-    db_query = ('SELECT HostName,AnsibleSSHHost,GroupName FROM inventory WHERE HostName="%s"' %(args.queryhost))
+    sql = ('SELECT HostName,AnsibleSSHHost,GroupName FROM inventory WHERE HostName="%s"' %(args.queryhost))
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
     cur = con.cursor()
-    cur.execute(db_query)
+    cur.execute(sql)
     rows = cur.fetchall()
     results = []
     results.append('inventory')
