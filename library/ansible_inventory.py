@@ -27,18 +27,29 @@ class DatetimeEncoder(json.JSONEncoder):
 
 # Setup arguments
 parser = argparse.ArgumentParser(description='Ansible Inventory...')
-parser.add_argument('-F','--function', help='Function to Execute, [default: all], valid choices: [groups | hosts | all | querygroup | queryhost]',default='all',required=False)
-parser.add_argument('-H','--host', help='Database Host, [default: 127.0.0.1]',default='127.0.0.1',required=False)
-parser.add_argument('-P','--password', help='Database Password',required=True)
-parser.add_argument('-QG','--querygroup', help='Query Group, Define Group to Query',required=False)
-parser.add_argument('-QH','--queryhost', help='Query Host, Define Host to Query',required=False)
-parser.add_argument('-U','--user', help='Database User',required=True)
+parser.add_argument('--addhost', help='Add Hostname',required=False)
+parser.add_argument('--function', help='Function to Execute, [default: all], valid choices: \
+[addhost | all | groups | hosts | querygroup | queryhost]',default='all',required=False)
+parser.add_argument('--host', help='Database Host, [default: 127.0.0.1]',default='127.0.0.1',required=False)
+parser.add_argument('--password', help='Database Password',required=True)
+parser.add_argument('--querygroup', help='Query Group, Define Group to Query',required=False)
+parser.add_argument('--queryhost', help='Query Host, Define Host to Query',required=False)
+parser.add_argument('--user', help='Database User',required=True)
 args = parser.parse_args()
 
 # Define Vars
 db_name = 'ansible_inventory'
 
 # Defined functions
+def add_host():
+    sql = ('REPLACE INTO Hosts(HostName) VALUES("%s")' %(args.addhost))
+    con = MySQLdb.connect(args.host, args.user, args.password, db_name);
+    cur = con.cursor()
+    cur.execute(sql)
+    con.commit()
+    cur.close()
+    con.close()
+
 def all_groups():
     sql = 'SELECT DISTINCT GroupName FROM inventory'
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
@@ -115,6 +126,8 @@ def query_host():
     con.close()
 
 # Decide which function to execute
+if args.function == "addhost":
+    add_host()
 if args.function == "all":
     all_inventory()
 elif args.function == "groups":
