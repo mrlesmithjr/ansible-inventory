@@ -27,9 +27,10 @@ class DatetimeEncoder(json.JSONEncoder):
 
 # Setup arguments
 parser = argparse.ArgumentParser(description='Ansible Inventory...')
-parser.add_argument('-F','--function', help='Function to Execute, [default: all], valid choices: [groups | hosts | all]',default='all',required=False)
+parser.add_argument('-F','--function', help='Function to Execute, [default: all], valid choices: [groups | hosts | all | queryhost]',default='all',required=False)
 parser.add_argument('-H','--host', help='Database Host, [default: 127.0.0.1]',default='127.0.0.1',required=False)
 parser.add_argument('-P','--password', help='Database Password',required=True)
+parser.add_argument('-QH','--queryhost', help='Query Host, Define Host to Query',required=False)
 parser.add_argument('-U','--user', help='Database User',required=True)
 args = parser.parse_args()
 
@@ -70,6 +71,17 @@ def all_inventory():
     cur.close()
     con.close()
 
+def query_host():
+    db_query = ('SELECT HostName,AnsibleSSHHost,GroupName FROM inventory WHERE HostName="%s"' %(args.queryhost))
+    con = MySQLdb.connect(args.host, args.user, args.password, db_name);
+    cur = con.cursor()
+    cur.execute(db_query)
+    rows = cur.fetchall()
+    for HostName, AnsibleSSHHost, GroupName in cur:
+        print(json.dumps({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost, 'groups': GroupName}))
+    cur.close()
+    con.close()
+
 # Decide which function to execute
 if args.function == "all":
     all_inventory()
@@ -77,3 +89,5 @@ elif args.function == "groups":
     all_groups()
 elif args.function == "hosts":
     all_hosts()
+elif args.function == "queryhost":
+    query_host()
