@@ -77,8 +77,6 @@ def all_groups():
     cur.execute(sql)
     rows = cur.fetchall()
     results = []
-    results.append('inventory')
-    results.append('groups')
     for row in rows:
         results.append(row)
     print(json.dumps(results))
@@ -99,8 +97,6 @@ def all_hosts():
     cur.execute(sql)
     rows = cur.fetchall()
     results = []
-    results.append('inventory')
-    results.append('hosts')
     for row in rows:
         results.append(row)
     print(json.dumps(results))
@@ -127,7 +123,6 @@ def all_inventory():
     cur.execute(sql)
     rows = cur.fetchall()
     results = []
-    results.append('inventory')
     for HostName, AnsibleSSHHost, HostDistribution, HostDistributionRelease, \
         HostDistributionVersion, GroupName in rows: \
         results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost, \
@@ -159,7 +154,6 @@ def query_group():
     cur.execute(sql)
     rows = cur.fetchall()
     results = []
-    results.append('inventory')
     for HostName, AnsibleSSHHost in rows:
         results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost})
     print(json.dumps(results))
@@ -186,7 +180,6 @@ def query_host():
     cur.execute(sql)
     rows = cur.fetchall()
     results = []
-    results.append('inventory')
     for HostName, AnsibleSSHHost, GroupName in rows:
         results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost,
                         'groups': GroupName})
