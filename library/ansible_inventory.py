@@ -1,16 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Larry Smith Jr.
-# http://everythingshouldbevirtual.com
-# @mrlesmithjr
-# mrlesmithjr@gmail.com
+"""ansible_inventory.py: Query/Manage Ansible Facts
 
+   This script will query or manage Ansible Facts into a useable inventory"""
 from __future__ import print_function
 
 # Import modules
 import argparse
 import json
 import MySQLdb
+
+__author__ = "Larry Smith Jr."
+__email___ = "mrlesmithjr@gmail.com"
+__maintainer__ = "Larry Smith Jr."
+__status__ = "Development"
+# http://everythingshouldbevirtual.com
+# @mrlesmithjr
 
 # Setup arguments
 parser = argparse.ArgumentParser(description='Ansible Inventory...')
@@ -33,6 +38,18 @@ args = parser.parse_args()
 
 # Defined functions
 def add_host():
+    """Add a new host to the inventory
+
+    This will add a new host to the inventory.
+
+    Keyword arguments:
+    :args.addhost -- The name of the host to add to the inventory.
+
+    Ex.
+    ansible_inventory.py --user ansible --password ansible --function addhost
+        --addhost testnode1
+    """
+
     sql = "INSERT INTO Hosts(HostName) VALUES('%s')" %(args.addhost)
     con = MySQLdb.connect(args.host, args.user, args.password, args.db)
     cur = con.cursor()
@@ -46,6 +63,14 @@ def add_host():
         print(e)
 
 def all_groups():
+    """Query all groups
+
+    This will query all groups in the inventory and return the results.
+
+    Ex.
+    ansible_inventory.py --user ansible --password --ansible --function groups
+    """
+
     sql = "SELECT DISTINCT GroupName FROM Groups"
     con = MySQLdb.connect(args.host, args.user, args.password, args.db)
     cur = con.cursor()
@@ -61,6 +86,13 @@ def all_groups():
     con.close()
 
 def all_hosts():
+    """Query all hosts
+
+    This will query all hosts in the inventory and return the results.
+
+    Ex.
+    ansible_inventory.py --user ansible --password ansible --function hosts
+    """
     sql = "SELECT DISTINCT HostName FROM Hosts"
     con = MySQLdb.connect(args.host, args.user, args.password, args.db)
     cur = con.cursor()
@@ -76,6 +108,16 @@ def all_hosts():
     con.close()
 
 def all_inventory():
+    """Query all hosts/groups
+
+    This will query all hosts/groups in the inventory and return the results.
+    This is also the default when executed as below...
+    ansible_inventory.py --user ansible --password ansible
+
+    Ex.
+    ansible_inventory.py --user ansible --password ansible --function all
+    """
+
     sql = """
         SELECT HostName,AnsibleSSHHost,HostDistribution,
         HostDistributionRelease,HostDistributionVersion,
@@ -98,6 +140,18 @@ def all_inventory():
     con.close()
 
 def query_group():
+    """Query a specific group
+
+    This will query a specific group and return the results.
+
+    Ex.
+    ansible_inventory.py --user ansible --password ansible --function querygroup
+        --querygroup test-nodes
+
+    Keyword arguments:
+    args.querygroup -- actual group to query
+    """
+
     sql = """SELECT HostName,AnsibleSSHHost FROM inventory WHERE
         GroupName='%s' ORDER BY HostName""" %(args.querygroup)
     con = MySQLdb.connect(args.host, args.user, args.password, args.db)
@@ -113,6 +167,18 @@ def query_group():
     con.close()
 
 def query_host():
+    """Query a specific host
+
+    This will query a specific group and return the results.
+
+    Ex.
+    ansible_inventory.py --user ansible --password ansible --function queryhost
+        --queryhost node0
+
+    Keyword arguments:
+    args.queryhost -- actual host to query
+    """
+
     sql = """SELECT HostName,AnsibleSSHHost,GroupName FROM inventory
         WHERE HostName='%s'""" %(args.queryhost)
     con = MySQLdb.connect(args.host, args.user, args.password, args.db)
