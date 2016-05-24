@@ -15,6 +15,8 @@ import MySQLdb
 # Setup arguments
 parser = argparse.ArgumentParser(description='Ansible Inventory...')
 parser.add_argument('--addhost', required=False, help='Add Hostname')
+parser.add_argument('--db', default='ansible_inventory', required=False,
+                    help='Database Name')
 parser.add_argument('--function', default='all', required=False,
                     help='Function to Execute...\n'
                     'valid function choices are\n'
@@ -29,13 +31,10 @@ parser.add_argument('--queryhost', required=False,
 parser.add_argument('--user', required=True, help='Database User')
 args = parser.parse_args()
 
-# Define Vars
-db_name = 'ansible_inventory'
-
 # Defined functions
 def add_host():
     sql = "INSERT INTO Hosts(HostName) VALUES('%s')" %(args.addhost)
-    con = MySQLdb.connect(args.host, args.user, args.password, db_name)
+    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
     cur = con.cursor()
     try:
         cur.execute(sql)
@@ -48,7 +47,7 @@ def add_host():
 
 def all_groups():
     sql = "SELECT DISTINCT GroupName FROM Groups"
-    con = MySQLdb.connect(args.host, args.user, args.password, db_name)
+    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
     cur = con.cursor()
     cur.execute(sql)
     rows = cur.fetchall()
@@ -63,7 +62,7 @@ def all_groups():
 
 def all_hosts():
     sql = "SELECT DISTINCT HostName FROM Hosts"
-    con = MySQLdb.connect(args.host, args.user, args.password, db_name)
+    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
     cur = con.cursor()
     cur.execute(sql)
     rows = cur.fetchall()
@@ -81,7 +80,7 @@ def all_inventory():
         SELECT HostName,AnsibleSSHHost,HostDistribution,
         HostDistributionRelease,HostDistributionVersion,
         GroupName FROM inventory"""
-    con = MySQLdb.connect(args.host, args.user, args.password, db_name)
+    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
     cur = con.cursor()
     cur.execute(sql)
     rows = cur.fetchall()
@@ -101,7 +100,7 @@ def all_inventory():
 def query_group():
     sql = """SELECT HostName,AnsibleSSHHost FROM inventory WHERE
         GroupName='%s' ORDER BY HostName""" %(args.querygroup)
-    con = MySQLdb.connect(args.host, args.user, args.password, db_name)
+    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
     cur = con.cursor()
     cur.execute(sql)
     rows = cur.fetchall()
@@ -116,7 +115,7 @@ def query_group():
 def query_host():
     sql = """SELECT HostName,AnsibleSSHHost,GroupName FROM inventory
         WHERE HostName='%s'""" %(args.queryhost)
-    con = MySQLdb.connect(args.host, args.user, args.password, db_name)
+    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
     cur = con.cursor()
     cur.execute(sql)
     rows = cur.fetchall()
