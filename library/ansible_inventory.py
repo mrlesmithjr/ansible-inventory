@@ -42,16 +42,20 @@ db_name = 'ansible_inventory'
 
 # Defined functions
 def add_host():
-    sql = ('REPLACE INTO Hosts(HostName) VALUES("%s")' %(args.addhost))
+    sql = ('INSERT INTO Hosts(HostName) VALUES("%s")' %(args.addhost))
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
     cur = con.cursor()
-    cur.execute(sql)
-    con.commit()
-    cur.close()
-    con.close()
+    try:
+        cur.execute(sql)
+        con.commit()
+        cur.close()
+        con.close()
+    except MySQLdb.IntegrityError as e:
+        print("IntegrityError")
+        print(e)
 
 def all_groups():
-    sql = 'SELECT DISTINCT GroupName FROM inventory'
+    sql = 'SELECT DISTINCT GroupName FROM Groups'
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
     cur = con.cursor()
     cur.execute(sql)
@@ -66,7 +70,7 @@ def all_groups():
     con.close()
 
 def all_hosts():
-    sql = 'SELECT DISTINCT HostName FROM inventory'
+    sql = 'SELECT DISTINCT HostName FROM Hosts'
     con = MySQLdb.connect(args.host, args.user, args.password, db_name);
     cur = con.cursor()
     cur.execute(sql)
