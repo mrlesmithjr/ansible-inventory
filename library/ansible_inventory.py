@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """ansible_inventory.py: Query/Manage Ansible Facts
 
    This script will query or manage Ansible Facts into a useable inventory"""
-from __future__ import print_function
 
 # Import modules
 import argparse
@@ -17,186 +15,140 @@ __status__ = "Development"
 # http://everythingshouldbevirtual.com
 # @mrlesmithjr
 
-# Setup arguments
-parser = argparse.ArgumentParser(description='Ansible Inventory...')
-parser.add_argument('--addhost', required=False, help='Add Hostname')
-parser.add_argument('--db', default='ansible_inventory', required=False,
-                    help='Database Name')
-parser.add_argument('--function', default='all', required=False,
-                    help='Function to Execute...\n'
-                    'valid function choices are\n'
-                    '[addhost | all | groups | hosts | querygroup | queryhost]')
-parser.add_argument('--host', default='127.0.0.1', required=False,
-                    help='Database Host, [default: 127.0.0.1]')
-parser.add_argument('--password', required=True, help='Database Password')
-parser.add_argument('--querygroup', required=False,
-                    help='Query Group, Define Group to Query')
-parser.add_argument('--queryhost', required=False,
-                    help='Query Host, Define Host to Query')
-parser.add_argument('--user', required=True, help='Database User')
-args = parser.parse_args()
+class AnsibleMySQL(object):
+    """ Setup Main execution """
 
-# Defined functions
-def add_host():
-    """Add a new host to the inventory
+    def __init__(self):
 
-    This will add a new host to the inventory.
+        self.inventory = {}
+        self.read_cli_args()
 
-    Keyword arguments:
-    :args.addhost -- The name of the host to add to the inventory.
+        if self.args.all:
+            self.inventory = self.all_inventory()
+        elif self.args.allgroups:
+            self.inventory = self.all_groups()
+        elif self.args.allhosts:
+            self.inventory = self.all_hosts()
+        elif self.args.querygroup:
+            self.inventory = self.query_group()
+        elif self.args.queryhost:
+            self.inventory = self.query_host()
+        else:
+            self.inventory = self.all_inventory()
+        self.con = MySQLdb.connect(self.args.host, self.args.user,
+                                   self.args.password, self.args.db)
+        self.cur = self.con.cursor()
+        self.cur.execute(self.sql)
+        self.rows = self.cur.fetchall()
+        self.process_results()
 
-    Ex.
-    ansible_inventory.py --user ansible --password ansible --function addhost
-        --addhost testnode1
-    """
+    def all_groups(self):
+        """Query all groups
 
-    sql = "INSERT INTO Hosts(HostName) VALUES('%s')" %(args.addhost)
-    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
-    cur = con.cursor()
-    try:
-        cur.execute(sql)
-        con.commit()
-        cur.close()
-        con.close()
-    except MySQLdb.IntegrityError as e:
-        print("IntegrityError")
-        print(e)
+        This will query all groups in the inventory and return the results.
 
-def all_groups():
-    """Query all groups
+        Ex.
+        ansible_inventory.py --user ansible --password --ansible --allgroups
+        """
 
-    This will query all groups in the inventory and return the results.
+        self.sql = "SELECT DISTINCT GroupName FROM Groups"
 
-    Ex.
-    ansible_inventory.py --user ansible --password --ansible --function groups
-    """
+    def all_hosts(self):
 
-    sql = "SELECT DISTINCT GroupName FROM Groups"
-    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
-    cur = con.cursor()
-    cur.execute(sql)
-    rows = cur.fetchall()
-    results = []
-    for row in rows:
-        results.append(row)
-    print(json.dumps(results))
-    cur.close()
-    con.close()
+        """Query all hosts
 
-def all_hosts():
-    """Query all hosts
+        This will query all hosts in the inventory and return the results.
 
-    This will query all hosts in the inventory and return the results.
+        Ex.
+        ansible_inventory.py --user ansible --password ansible --allhosts
+        """
 
-    Ex.
-    ansible_inventory.py --user ansible --password ansible --function hosts
-    """
-    sql = "SELECT DISTINCT HostName FROM Hosts"
-    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
-    cur = con.cursor()
-    cur.execute(sql)
-    rows = cur.fetchall()
-    results = []
-    for row in rows:
-        results.append(row)
-    print(json.dumps(results))
-    cur.close()
-    con.close()
+        self.sql = "SELECT DISTINCT HostName FROM Hosts"
 
-def all_inventory():
-    """Query all hosts/groups
+    def all_inventory(self):
 
-    This will query all hosts/groups in the inventory and return the results.
-    This is also the default when executed as below...
-    ansible_inventory.py --user ansible --password ansible
+        """Query all hosts/groups
 
-    Ex.
-    ansible_inventory.py --user ansible --password ansible --function all
-    """
+        This will query all hosts/groups in the inventory and return the results.
+        This is also the default when executed as below...
+        ansible_inventory.py --user ansible --password ansible
 
-    sql = """
-        SELECT HostName,AnsibleSSHHost,HostDistribution,
-        HostDistributionRelease,HostDistributionVersion,
-        GroupName FROM inventory"""
-    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
-    cur = con.cursor()
-    cur.execute(sql)
-    rows = cur.fetchall()
-    results = []
-    for HostName, AnsibleSSHHost, HostDistribution, HostDistributionRelease, \
-        HostDistributionVersion, GroupName in rows: \
-        results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost, \
-        'ansible_distribution': HostDistribution, \
-        'ansible_distribution_release': HostDistributionRelease, \
-        'ansible_distribution_version': HostDistributionVersion, \
-        'groups': GroupName})
-    print(json.dumps(results, sort_keys=True))
-    cur.close()
-    con.close()
+        Ex.
+        ansible_inventory.py --user ansible --password ansible
+          or
+         ansible_inventory.py --user ansible --password ansible --all
+        """
 
-def query_group():
-    """Query a specific group
+        self.sql = """
+            SELECT HostName,AnsibleSSHHost,HostDistribution,
+            HostDistributionRelease,HostDistributionVersion,
+            GroupName FROM inventory"""
 
-    This will query a specific group and return the results.
+    def process_results(self):
 
-    Ex.
-    ansible_inventory.py --user ansible --password ansible --function querygroup
-        --querygroup test-nodes
+        """ Process and display results of the query"""
 
-    Keyword arguments:
-    args.querygroup -- actual group to query
-    """
+        self.results = []
+        for self.row in self.rows:
+            self.results.append(self.row)
+        print json.dumps(self.results, sort_keys=True)
 
-    sql = """SELECT HostName,AnsibleSSHHost FROM inventory WHERE
-        GroupName='%s' ORDER BY HostName""" %(args.querygroup)
-    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
-    cur = con.cursor()
-    cur.execute(sql)
-    rows = cur.fetchall()
-    results = []
-    for HostName, AnsibleSSHHost in rows:
-        results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost})
-    print(json.dumps(results))
-    cur.close()
-    con.close()
+    def query_group(self):
 
-def query_host():
-    """Query a specific host
+        """Query a specific group
 
-    This will query a specific group and return the results.
+        This will query a specific group and return the results.
 
-    Ex.
-    ansible_inventory.py --user ansible --password ansible --function queryhost
-        --queryhost node0
+        Ex.
+        ansible_inventory.py --user ansible --password ansible
+            --querygroup test-nodes
 
-    Keyword arguments:
-    args.queryhost -- actual host to query
-    """
+        Keyword arguments:
+        args.querygroup -- actual group to query
+        """
 
-    sql = """SELECT HostName,AnsibleSSHHost,GroupName FROM inventory
-        WHERE HostName='%s'""" %(args.queryhost)
-    con = MySQLdb.connect(args.host, args.user, args.password, args.db)
-    cur = con.cursor()
-    cur.execute(sql)
-    rows = cur.fetchall()
-    results = []
-    for HostName, AnsibleSSHHost, GroupName in rows:
-        results.append({'host': HostName, 'ansible_ssh_host': AnsibleSSHHost,
-                        'groups': GroupName})
-    print(json.dumps(results, sort_keys=True))
-    cur.close()
-    con.close()
+        self.sql = """
+            SELECT HostName,AnsibleSSHHost FROM inventory WHERE
+            GroupName='%s' ORDER BY HostName""" %(self.args.querygroup)
 
-# Decide which function to execute
-if args.function == "addhost":
-    add_host()
-if args.function == "all":
-    all_inventory()
-elif args.function == "groups":
-    all_groups()
-elif args.function == "hosts":
-    all_hosts()
-elif args.function == "queryhost":
-    query_host()
-elif args.function == "querygroup":
-    query_group()
+    def query_host(self):
+
+        """Query a specific host
+
+        This will query a specific group and return the results.
+
+        Ex.
+        ansible_inventory.py --user ansible --password ansible --queryhost node0
+
+        Keyword arguments:
+        args.queryhost -- actual host to query
+        """
+
+        self.sql = """
+            SELECT HostName,AnsibleSSHHost,GroupName FROM inventory
+            WHERE HostName='%s'""" %(self.args.queryhost)
+
+    def read_cli_args(self):
+        """ Setup and Read Command Line Arguments to Pass"""
+
+        parser = argparse.ArgumentParser(description='Ansible Inventory...')
+        parser.add_argument('--all', help='Display all inventory items',
+                            action='store_true')
+        parser.add_argument('--allgroups', help='Display all groups',
+                            action='store_true')
+        parser.add_argument('--allhosts', help='Display all hosts',
+                            action='store_true')
+        parser.add_argument('--db', default='ansible_inventory',
+                            help='Database Name')
+        parser.add_argument('--host', default='127.0.0.1',
+                            help='Database Host, [default: 127.0.0.1]')
+        parser.add_argument('--password', required=True,
+                            help='Database Password')
+        parser.add_argument('--querygroup',
+                            help='Query Group, Define Group to Query')
+        parser.add_argument('--queryhost',
+                            help='Query Host, Define Host to Query')
+        parser.add_argument('--user', required=True, help='Database User')
+        self.args = parser.parse_args()
+
+AnsibleMySQL()
