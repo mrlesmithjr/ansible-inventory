@@ -1,9 +1,9 @@
 {% for item in groups.all %}
-REPLACE INTO Hosts(HostName) VALUES ('{{ hostvars[item].inventory_hostname }}');
+INSERT IGNORE INTO Hosts(HostName) VALUES ('{{ hostvars[item].inventory_hostname }}');
 {% endfor %}
 {% for item in groups.all %}
 {%   for grp in hostvars[item].group_names %}
-REPLACE INTO Groups(GroupName) VALUES ('{{ grp }}');
+INSERT IGNORE INTO Groups(GroupName) VALUES ('{{ grp }}');
 {%   endfor %}
 {% endfor %}
 {% for item in groups.all %}
