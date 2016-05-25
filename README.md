@@ -83,10 +83,10 @@ library/ansible_inventory.py
 
 Show script help..
 ````
-python library/ansible_inventory.py -h
+ansible_inventory.py -h
 ````
 ````
-usage: ansible_inventory.py [-h] [--addhost ADDHOST] [--function FUNCTION]
+usage: ansible_inventory.py [-h] [--all] [--allgroups] [--allhosts] [--db DB]
                             [--host HOST] --password PASSWORD
                             [--querygroup QUERYGROUP] [--queryhost QUERYHOST]
                             --user USER
@@ -95,10 +95,10 @@ Ansible Inventory...
 
 optional arguments:
   -h, --help            show this help message and exit
-  --addhost ADDHOST     Add Hostname
-  --function FUNCTION   Function to Execute, [default: all], valid choices:
-                        [addhost | all | groups | hosts | querygroup |
-                        queryhost]
+  --all                 Display all inventory items
+  --allgroups           Display all groups
+  --allhosts            Display all hosts
+  --db DB               Database Name
   --host HOST           Database Host, [default: 127.0.0.1]
   --password PASSWORD   Database Password
   --querygroup QUERYGROUP
@@ -109,38 +109,38 @@ optional arguments:
 ````
 Default query...
 ````
-python library/ansible_inventory.py --user ansible --password ansible
+ansible_inventory.py --user ansible --password ansible
 ````
 ````
-["inventory", {"ansible_ssh_host": "172.28.128.21", "ansible_distribution": "Ubuntu", "host": "node0", "ansible_distribution_release": "trusty", "groups": "db-nodes", "ansible_distribution_version": "14.04"}, {"ansible_ssh_host": "172.28.128.22", "ansible_distribution": "Ubuntu", "host": "node1", "ansible_distribution_release": "trusty", "groups": "mixed-nodes", "ansible_distribution_version": "14.04"}, {"ansible_ssh_host": "172.28.128.22", "ansible_distribution": "Ubuntu", "host": "node1", "ansible_distribution_release": "trusty", "groups": "test-nodes", "ansible_distribution_version": "14.04"}, {"ansible_ssh_host": "172.28.128.23", "ansible_distribution": "Ubuntu", "host": "node2", "ansible_distribution_release": "trusty", "groups": "mixed-nodes", "ansible_distribution_version": "14.04"}, {"ansible_ssh_host": "172.28.128.23", "ansible_distribution": "Ubuntu", "host": "node2", "ansible_distribution_release": "trusty", "groups": "test-nodes", "ansible_distribution_version": "14.04"}, {"ansible_ssh_host": "172.28.128.24", "ansible_distribution": "Ubuntu", "host": "node3", "ansible_distribution_release": "trusty", "groups": "test-nodes", "ansible_distribution_version": "14.04"}, {"ansible_ssh_host": "172.28.128.25", "ansible_distribution": "Ubuntu", "host": "node4", "ansible_distribution_release": "trusty", "groups": "mixed-nodes", "ansible_distribution_version": "14.04"}, {"ansible_ssh_host": "172.28.128.25", "ansible_distribution": "Ubuntu", "host": "node4", "ansible_distribution_release": "trusty", "groups": "random-nodes", "ansible_distribution_version": "14.04"}, {"ansible_ssh_host": "172.28.128.26", "ansible_distribution": "Ubuntu", "host": "node5", "ansible_distribution_release": "trusty", "groups": "random-nodes", "ansible_distribution_version": "14.04"}]
+[["node0", "172.28.128.21", "Ubuntu", "trusty", "14.04", "db-nodes"], ["node1", "172.28.128.22", "Ubuntu", "trusty", "14.04", "mixed-nodes"], ["node1", "172.28.128.22", "Ubuntu", "trusty", "14.04", "test-nodes"], ["node2", "172.28.128.23", "Ubuntu", "trusty", "14.04", "mixed-nodes"], ["node2", "172.28.128.23", "Ubuntu", "trusty", "14.04", "test-nodes"], ["node3", "172.28.128.24", "Ubuntu", "trusty", "14.04", "test-nodes"], ["node4", "172.28.128.25", "Ubuntu", "trusty", "14.04", "mixed-nodes"], ["node4", "172.28.128.25", "Ubuntu", "trusty", "14.04", "random-nodes"], ["node5", "172.28.128.26", "Ubuntu", "trusty", "14.04", "random-nodes"]]
 ````
 Query all groups...
 ````
-python library/ansible_inventory.py --user ansible --password ansible --function groups
+ansible_inventory.py --user ansible --password ansible --allgroups
 ````
 ````
-["inventory", "groups", ["db-nodes"], ["mixed-nodes"], ["test-nodes"], ["random-nodes"]]
+[["db-nodes"], ["mixed-nodes"], ["random-nodes"], ["test-nodes"]]
 ````
 Query all hosts...
 ````
-python library/ansible_inventory.py --user ansible --password ansible --function hosts
+ansible_inventory.py --user ansible --password ansible --allhosts
 ````
 ````
-["inventory", "hosts", ["node0"], ["node1"], ["node2"], ["node3"], ["node4"], ["node5"]]
+[["node0"], ["node1"], ["node2"], ["node3"], ["node4"], ["node5"], ["test2"], ["test5"], ["WTF"]]
 ````
 Query a specific group...
 ````
-python library/ansible_inventory.py --user ansible --password ansible --function querygroup --querygroup test-nodes
+ansible_inventory.py --user ansible --password ansible --querygroup test-nodes
 ````
 ````
-["inventory", {"ansible_ssh_host": "172.28.128.22", "host": "node1"}, {"ansible_ssh_host": "172.28.128.23", "host": "node2"}, {"ansible_ssh_host": "172.28.128.24", "host": "node3"}]
+[["node1", "172.28.128.22"], ["node2", "172.28.128.23"], ["node3", "172.28.128.24"]]
 ````
 Query a specific host...
 ````
-python library/ansible_inventory.py --user ansible --password ansible --function queryhost --queryhost node1
+ansible_inventory.py --user ansible --password ansible --queryhost node1
 ````
 ````
-["inventory", {"ansible_ssh_host": "172.28.128.22", "host": "node1", "groups": "mixed-nodes"}, {"ansible_ssh_host": "172.28.128.22", "host": "node1", "groups": "test-nodes"}]
+[["node1", "172.28.128.22", "mixed-nodes"], ["node1", "172.28.128.22", "test-nodes"]]
 ````
 
 License
