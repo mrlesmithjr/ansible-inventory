@@ -40,6 +40,8 @@ class AnsibleMySQL(object):
         self.cur = self.con.cursor()
         self.cur.execute(self.sql)
         self.rows = self.cur.fetchall()
+        self.cur.close()
+        self.con.close()
         self.process_results()
 
     def all_groups(self):
