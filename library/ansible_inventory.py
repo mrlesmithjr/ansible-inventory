@@ -28,26 +28,26 @@ class AnsibleMySQL(object):
 
         if self.args.all:
             self.sql = """
-                SELECT HostName,AnsibleSSHHost,HostDistribution,
-                HostDistributionRelease,HostDistributionVersion,
-                GroupName FROM inventory"""
+                SELECT `inventory_hostname`,`ansible_ssh_host`,`ansible_distribution`,
+                `ansible_distribution_release`,`ansible_distribution_version`,
+                `group_names` FROM inventory"""
         elif self.args.allgroups:
-            self.sql = "SELECT DISTINCT GroupName FROM Groups"
+            self.sql = "SELECT DISTINCT `group_names` FROM Groups"
         elif self.args.allhosts:
-            self.sql = "SELECT DISTINCT HostName FROM Hosts"
+            self.sql = "SELECT DISTINCT `inventory_hostname` FROM Hosts"
         elif self.args.querygroup:
             self.sql = """
-                SELECT HostName,AnsibleSSHHost FROM inventory WHERE
-                GroupName='%s' ORDER BY HostName""" %(self.args.querygroup)
+                SELECT `inventory_hostname`,`ansible_ssh_host` FROM inventory WHERE
+                `group_names`='%s' ORDER BY `inventory_hostname`""" %(self.args.querygroup)
         elif self.args.queryhost:
             self.sql = """
-                SELECT HostName,AnsibleSSHHost,GroupName FROM inventory
-                WHERE HostName='%s'""" %(self.args.queryhost)
+                SELECT `inventory_hostname`,`ansible_ssh_host`,`group_names` FROM inventory
+                WHERE `inventory_hostname`='%s'""" %(self.args.queryhost)
         else:
             self.sql = """
-                SELECT HostName,AnsibleSSHHost,HostDistribution,
-                HostDistributionRelease,HostDistributionVersion,
-                GroupName FROM inventory"""
+                SELECT `inventory_hostname`,`ansible_ssh_host`,`ansible_distribution`,
+                `ansible_distribution_release`,`ansible_distribution_version`,
+                `group_names` FROM inventory"""
 
         self.gather_inventory()
         self.process_results()
@@ -72,8 +72,10 @@ class AnsibleMySQL(object):
         Process and display results of the query
         """
 
+        self.columns = [desc[0] for desc in self.cur.description]
         self.results = []
         for self.row in self.rows:
+            self.row = dict(zip(self.columns, self.row))
             self.results.append(self.row)
         print json.dumps(self.results, sort_keys=True)
 

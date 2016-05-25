@@ -88,14 +88,14 @@ DROP TABLE IF EXISTS `Groups`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Groups` (
   `GroupId` int(11) NOT NULL AUTO_INCREMENT,
-  `GroupName` varchar(255) NOT NULL,
+  `group_names` varchar(255) NOT NULL,
   `GroupDescription` varchar(255) DEFAULT NULL,
   `GroupDTAP` char(1) DEFAULT '',
   `GroupCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`GroupId`),
-  UNIQUE KEY `GroupName` (`GroupName`)
-) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=latin1;
+  UNIQUE KEY `group_names` (`group_names`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -107,44 +107,41 @@ DROP TABLE IF EXISTS `HostDetails`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `HostDetails` (
   `HostDetailsId` int(11) NOT NULL AUTO_INCREMENT,
-  `HostArchitecture` varchar(255) DEFAULT NULL,
-  `HostBIOSDate` varchar(255) DEFAULT NULL,
-  `HostBIOSVersion` varchar(255) DEFAULT NULL,
-  `HostDistribution` varchar(255) DEFAULT NULL,
-  `HostDistributionRelease` varchar(255) DEFAULT NULL,
-  `HostDistributionVersion` varchar(255) DEFAULT NULL,
-  `HostFQDN` varchar(255) DEFAULT NULL,
-  `HostHardDrive` varchar(255) DEFAULT NULL,
-  `HostHardDrivePartions` varchar(255) DEFAULT NULL,
-  `HostHardDriveSize` varchar(255) DEFAULT NULL,
-  `HostInterface` varchar(255) DEFAULT NULL,
-  `HostInterfaceAddress` varchar(255) DEFAULT NULL,
-  `HostInterfaceGateway` varchar(255) DEFAULT NULL,
-  `HostInterfaceMAC` varchar(255) DEFAULT NULL,
-  `HostInterfaceNetmask` varchar(255) DEFAULT NULL,
-  `HostInterfaces` varchar(255) DEFAULT NULL,
-  `HostKernel` varchar(255) DEFAULT NULL,
-  `HostMemFreeMB` int(11) DEFAULT NULL,
-  `HostMemTotalMB` int(11) DEFAULT NULL,
-  `HostMounts` varchar(255) DEFAULT NULL,
-  `HostOSFamily` varchar(255) DEFAULT NULL,
-  `HostProcessor` varchar(255) DEFAULT NULL,
-  `HostProcessorCores` int(11) DEFAULT NULL,
-  `HostProcessorCount` int(11) DEFAULT NULL,
-  `HostProductName` varchar(255) DEFAULT NULL,
-  `HostSwapFree` int(11) DEFAULT NULL,
-  `HostSwapTotal` int(11) DEFAULT NULL,
-  `HostSystemVendor` varchar(255) DEFAULT NULL,
-  `HostTimeZone` varchar(255) DEFAULT NULL,
-  `HostVirtualizationType` varchar(255) DEFAULT NULL,
+  `ansible_architecture` varchar(255) DEFAULT NULL,
+  `ansible_bios_date` varchar(255) DEFAULT NULL,
+  `ansible_bios_version` varchar(255) DEFAULT NULL,
+  `ansible_date_time.tz` varchar(255) DEFAULT NULL,
+  `ansible_default_ipv4.address` varchar(255) DEFAULT NULL,
+  `ansible_default_ipv4.gateway` varchar(255) DEFAULT NULL,
+  `ansible_default_ipv4.interface` varchar(255) DEFAULT NULL,
+  `ansible_default_ipv4.macaddress` varchar(255) DEFAULT NULL,
+  `ansible_default_ipv4.netmask` varchar(255) DEFAULT NULL,
+  `ansible_distribution` varchar(255) DEFAULT NULL,
+  `ansible_distribution_release` varchar(255) DEFAULT NULL,
+  `ansible_distribution_version` varchar(255) DEFAULT NULL,
+  `ansible_fqdn` varchar(255) DEFAULT NULL,
+  `ansible_kernel` varchar(255) DEFAULT NULL,
+  `ansible_hostname` varchar(255) DEFAULT NULL,
+  `ansible_memfree_mb` int(11) DEFAULT NULL,
+  `ansible_memtotal_mb` int(11) DEFAULT NULL,
+  `ansible_nodename` varchar(255) DEFAULT NULL,
+  `ansible_os_family` varchar(255) DEFAULT NULL,
+  `ansible_processor` varchar(255) DEFAULT NULL,
+  `ansible_processor_cores` int(11) DEFAULT NULL,
+  `ansible_processor_count` int(11) DEFAULT NULL,
+  `ansible_product_name` varchar(255) DEFAULT NULL,
+  `ansible_ssh_host` varchar(255) DEFAULT NULL,
+  `ansible_swapfree_mb` int(11) DEFAULT NULL,
+  `ansible_swaptotal_mb` int(11) DEFAULT NULL,
+  `ansible_system_vendor` varchar(255) DEFAULT NULL,
+  `ansible_virtualization_type` varchar(255) DEFAULT NULL,
   `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `HostId` int(11) DEFAULT NULL,
-  `AnsibleSSHHost` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`HostDetailsId`),
-  UNIQUE KEY `HostFQDN` (`HostFQDN`),
+  UNIQUE KEY `ansible_fqdn` (`ansible_fqdn`),
   UNIQUE KEY `HostId` (`HostId`),
   CONSTRAINT `HostDetails_ibfk_1` FOREIGN KEY (`HostId`) REFERENCES `Hosts` (`HostId`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -157,15 +154,15 @@ DROP TABLE IF EXISTS `HostGroups`;
 CREATE TABLE `HostGroups` (
   `HostGroupId` int(11) NOT NULL AUTO_INCREMENT,
   `GroupId` int(11) NOT NULL,
-  `GroupName` varchar(255) NOT NULL,
+  `group_names` varchar(255) NOT NULL,
   `HostId` int(11) NOT NULL,
-  `HostName` varchar(255) NOT NULL,
+  `inventory_hostname` varchar(255) NOT NULL,
   PRIMARY KEY (`HostGroupId`),
   UNIQUE KEY `HostId` (`HostId`,`GroupId`),
   KEY `GroupId` (`GroupId`),
   CONSTRAINT `HostGroups_ibfk_1` FOREIGN KEY (`GroupId`) REFERENCES `Groups` (`GroupId`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `HostGroups_ibfk_2` FOREIGN KEY (`HostId`) REFERENCES `Hosts` (`HostId`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -177,13 +174,13 @@ DROP TABLE IF EXISTS `Hosts`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Hosts` (
   `HostId` int(11) NOT NULL AUTO_INCREMENT,
-  `HostName` varchar(255) NOT NULL,
+  `inventory_hostname` varchar(255) NOT NULL,
   `HostDescription` varchar(255) DEFAULT NULL,
   `HostCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`HostId`),
-  UNIQUE KEY `HostName` (`HostName`)
-) ENGINE=InnoDB AUTO_INCREMENT=134 DEFAULT CHARSET=latin1;
+  UNIQUE KEY `inventory_hostname` (`inventory_hostname`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -197,13 +194,13 @@ CREATE TABLE `Hosts` (
 
 CREATE OR REPLACE VIEW `inventory`
 AS SELECT
-   `h`.`HostName` AS `HostName`,
-   `hd`.`AnsibleSSHHost` AS `AnsibleSSHHost`,
-   `hg`.`GroupName` AS `GroupName`,
-   `hd`.`HostDistribution` AS `HostDistribution`,
-   `hd`.`HostDistributionRelease` AS `HostDistributionRelease`,
-   `hd`.`HostDistributionVersion` AS `HostDistributionVersion`,
+   `h`.`inventory_hostname` AS `inventory_hostname`,
+   `hd`.`ansible_ssh_host` AS `ansible_ssh_host`,
+   `hg`.`group_names` AS `group_names`,
+   `hd`.`ansible_distribution` AS `ansible_distribution`,
+   `hd`.`ansible_distribution_release` AS `ansible_distribution_release`,
+   `hd`.`ansible_distribution_version` AS `ansible_distribution_version`,
    `hd`.`LastUpdateTime` AS `LastUpdateTime`
-FROM ((`Hosts` `h` join `HostDetails` `hd` on((`h`.`HostId` = `hd`.`HostId`))) join `HostGroups` `hg` on((`hd`.`HostId` = `hg`.`HostId`))) order by `h`.`HostName`;
+FROM ((`Hosts` `h` join `HostDetails` `hd` on((`h`.`HostId` = `hd`.`HostId`))) join `HostGroups` `hg` on((`hd`.`HostId` = `hg`.`HostId`))) order by `h`.`inventory_hostname`;
 
 -- Dump completed on 2016-05-21 16:50:32
