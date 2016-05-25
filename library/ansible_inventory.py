@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-"""ansible_inventory.py: Query/Manage Ansible Facts
+"""
+ansible_inventory.py: Query/Manage Ansible Facts
 
-   This script will query or manage Ansible Facts into a useable inventory"""
+This script will query or manage Ansible Facts into a useable inventory
+"""
 
 # Import modules
 import argparse
@@ -16,7 +18,9 @@ __status__ = "Development"
 # @mrlesmithjr
 
 class AnsibleMySQL(object):
-    """ Setup Main execution """
+    """
+    Setup Main execution
+    """
 
     def __init__(self):
 
@@ -45,18 +49,28 @@ class AnsibleMySQL(object):
                 HostDistributionRelease,HostDistributionVersion,
                 GroupName FROM inventory"""
 
-        self.con = MySQLdb.connect(self.args.host, self.args.user,
-                                   self.args.password, self.args.db)
-        self.cur = self.con.cursor()
-        self.cur.execute(self.sql)
-        self.rows = self.cur.fetchall()
-        self.cur.close()
-        self.con.close()
+        self.gather_inventory()
         self.process_results()
+
+    def gather_inventory(self):
+        """
+        Gather inventory from MySQL based on query
+        """
+        try:
+            self.con = MySQLdb.connect(self.args.host, self.args.user,
+                                       self.args.password, self.args.db)
+            self.cur = self.con.cursor()
+            self.cur.execute(self.sql)
+            self.rows = self.cur.fetchall()
+        finally:
+            self.cur.close()
+            self.con.close()
 
     def process_results(self):
 
-        """ Process and display results of the query"""
+        """
+        Process and display results of the query
+        """
 
         self.results = []
         for self.row in self.rows:
@@ -64,7 +78,9 @@ class AnsibleMySQL(object):
         print json.dumps(self.results, sort_keys=True)
 
     def read_cli_args(self):
-        """ Setup and Read Command Line Arguments to Pass"""
+        """
+        Setup and Read Command Line Arguments to Pass
+        """
 
         parser = argparse.ArgumentParser(description='Ansible Inventory...')
         parser.add_argument('--all', help='Display all inventory items',
