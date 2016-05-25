@@ -20,21 +20,21 @@ class AnsibleMySQL(object):
 
     def __init__(self):
 
-        self.inventory = {}
         self.read_cli_args()
 
         if self.args.all:
-            self.inventory = self.all_inventory()
+            self.all_inventory()
         elif self.args.allgroups:
-            self.inventory = self.all_groups()
+            self.all_groups()
         elif self.args.allhosts:
-            self.inventory = self.all_hosts()
+            self.all_hosts()
         elif self.args.querygroup:
-            self.inventory = self.query_group()
+            self.query_group()
         elif self.args.queryhost:
-            self.inventory = self.query_host()
+            self.query_host()
         else:
-            self.inventory = self.all_inventory()
+            self.all_inventory()
+
         self.con = MySQLdb.connect(self.args.host, self.args.user,
                                    self.args.password, self.args.db)
         self.cur = self.con.cursor()
