@@ -23,17 +23,27 @@ class AnsibleMySQL(object):
         self.read_cli_args()
 
         if self.args.all:
-            self.all_inventory()
+            self.sql = """
+                SELECT HostName,AnsibleSSHHost,HostDistribution,
+                HostDistributionRelease,HostDistributionVersion,
+                GroupName FROM inventory"""
         elif self.args.allgroups:
-            self.all_groups()
+            self.sql = "SELECT DISTINCT GroupName FROM Groups"
         elif self.args.allhosts:
-            self.all_hosts()
+            self.sql = "SELECT DISTINCT HostName FROM Hosts"
         elif self.args.querygroup:
-            self.query_group()
+            self.sql = """
+                SELECT HostName,AnsibleSSHHost FROM inventory WHERE
+                GroupName='%s' ORDER BY HostName""" %(self.args.querygroup)
         elif self.args.queryhost:
-            self.query_host()
+            self.sql = """
+                SELECT HostName,AnsibleSSHHost,GroupName FROM inventory
+                WHERE HostName='%s'""" %(self.args.queryhost)
         else:
-            self.all_inventory()
+            self.sql = """
+                SELECT HostName,AnsibleSSHHost,HostDistribution,
+                HostDistributionRelease,HostDistributionVersion,
+                GroupName FROM inventory"""
 
         self.con = MySQLdb.connect(self.args.host, self.args.user,
                                    self.args.password, self.args.db)
@@ -44,48 +54,6 @@ class AnsibleMySQL(object):
         self.con.close()
         self.process_results()
 
-    def all_groups(self):
-        """Query all groups
-
-        This will query all groups in the inventory and return the results.
-
-        Ex.
-        ansible_inventory.py --user ansible --password --ansible --allgroups
-        """
-
-        self.sql = "SELECT DISTINCT GroupName FROM Groups"
-
-    def all_hosts(self):
-
-        """Query all hosts
-
-        This will query all hosts in the inventory and return the results.
-
-        Ex.
-        ansible_inventory.py --user ansible --password ansible --allhosts
-        """
-
-        self.sql = "SELECT DISTINCT HostName FROM Hosts"
-
-    def all_inventory(self):
-
-        """Query all hosts/groups
-
-        This will query all hosts/groups in the inventory and return the results.
-        This is also the default when executed as below...
-        ansible_inventory.py --user ansible --password ansible
-
-        Ex.
-        ansible_inventory.py --user ansible --password ansible
-          or
-         ansible_inventory.py --user ansible --password ansible --all
-        """
-
-        self.sql = """
-            SELECT HostName,AnsibleSSHHost,HostDistribution,
-            HostDistributionRelease,HostDistributionVersion,
-            GroupName FROM inventory"""
-
     def process_results(self):
 
         """ Process and display results of the query"""
@@ -94,41 +62,6 @@ class AnsibleMySQL(object):
         for self.row in self.rows:
             self.results.append(self.row)
         print json.dumps(self.results, sort_keys=True)
-
-    def query_group(self):
-
-        """Query a specific group
-
-        This will query a specific group and return the results.
-
-        Ex.
-        ansible_inventory.py --user ansible --password ansible
-            --querygroup test-nodes
-
-        Keyword arguments:
-        args.querygroup -- actual group to query
-        """
-
-        self.sql = """
-            SELECT HostName,AnsibleSSHHost FROM inventory WHERE
-            GroupName='%s' ORDER BY HostName""" %(self.args.querygroup)
-
-    def query_host(self):
-
-        """Query a specific host
-
-        This will query a specific group and return the results.
-
-        Ex.
-        ansible_inventory.py --user ansible --password ansible --queryhost node0
-
-        Keyword arguments:
-        args.queryhost -- actual host to query
-        """
-
-        self.sql = """
-            SELECT HostName,AnsibleSSHHost,GroupName FROM inventory
-            WHERE HostName='%s'""" %(self.args.queryhost)
 
     def read_cli_args(self):
         """ Setup and Read Command Line Arguments to Pass"""
