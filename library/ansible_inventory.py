@@ -86,4 +86,5 @@ class AnsibleMySQL(object):
         parser.add_argument('--user', required=True, help='Database User')
         self.args = parser.parse_args()
 
-AnsibleMySQL()
+if __name__ == '__main__':
+    AnsibleMySQL()
