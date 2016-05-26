@@ -7,6 +7,7 @@ This script will query or manage Ansible Facts into a useable inventory
 
 # Import modules
 import argparse
+import datetime
 import json
 import MySQLdb
 
@@ -43,6 +44,13 @@ class AnsibleMySQL(object):
             self.sql = """
                 SELECT `inventory_hostname`,`ansible_ssh_host`,`group_names` FROM inventory
                 WHERE `inventory_hostname`='%s'""" %(self.args.queryhost)
+        elif self.args.queryhostdetails:
+            self.sql = """
+                SELECT *
+                FROM HostDetails
+                WHERE HostId IN
+                (SELECT HostID FROM Hosts WHERE inventory_hostname = '%s')
+            """ %(self.args.queryhostdetails)
         else:
             self.sql = """
                 SELECT `inventory_hostname`,`ansible_ssh_host`,`ansible_distribution`,
@@ -77,7 +85,7 @@ class AnsibleMySQL(object):
         for self.row in self.rows:
             self.row = dict(zip(self.columns, self.row))
             self.results.append(self.row)
-        print json.dumps(self.results, sort_keys=True)
+        print json.dumps(self.results, sort_keys=True, default=datetime_handler)
 
     def read_cli_args(self):
         """
@@ -101,8 +109,18 @@ class AnsibleMySQL(object):
                             help='Query Group, Define Group to Query')
         parser.add_argument('--queryhost',
                             help='Query Host, Define Host to Query')
+        parser.add_argument('--queryhostdetails',
+                            help='Query Host Full Details, Define Host to Query')
         parser.add_argument('--user', required=True, help='Database User')
         self.args = parser.parse_args()
+
+def datetime_handler(obj):
+    """
+    JSON serializer for objects not serializable by default json code
+    """
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    raise TypeError("Unknown type")
 
 if __name__ == '__main__':
     AnsibleMySQL()
