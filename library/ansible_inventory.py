@@ -106,7 +106,12 @@ class AnsibleMySQL(object):
         for self.row in self.rows:
             self.row = dict(zip(self.columns, self.row))
             self.results.append(self.row)
-        print json.dumps(self.results, sort_keys=True, default=datetime_handler)
+        if self.args.prettyprint:
+            print json.dumps(self.results, default=datetime_handler,
+                             sort_keys=True, indent=2, separators=(',', ': '))
+        elif not self.args.prettyprint:
+            print json.dumps(self.results, default=datetime_handler,
+                             sort_keys=True)
 
     def read_cli_args(self):
         """
@@ -126,6 +131,8 @@ class AnsibleMySQL(object):
                             help='Database Host, [default: 127.0.0.1]')
         parser.add_argument('--password', required=True,
                             help='Database Password')
+        parser.add_argument('--prettyprint', default=False, help='Print pretty JSON',
+                            action='store_true')
         parser.add_argument('--querygroup',
                             help='Query Group, Define Group to Query')
         parser.add_argument('--queryhost',
