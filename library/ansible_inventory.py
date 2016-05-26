@@ -29,31 +29,39 @@ class AnsibleMySQL(object):
 
         if self.args.all:
             self.sql = """
-                SELECT
-                `inventory_hostname`,`ansible_ssh_host`,`ansible_distribution`,
-                `ansible_distribution_release`,`ansible_distribution_version`,
-                `group_names`
-                FROM inventory"""
+                SELECT h.inventory_hostname, hg.group_names, hd.*
+                FROM
+                HostDetails AS hd, Hosts AS h, HostGroups AS hg
+                WHERE h.HostId = hd.HostId AND h.HostId = hg.HostId
+                ORDER BY h.inventory_hostname
+                """
         elif self.args.allgroups:
             self.sql = """
                 SELECT DISTINCT `group_names`
-                FROM Groups"""
+                FROM Groups
+                ORDER BY group_names
+                """
         elif self.args.allhosts:
             self.sql = """
                 SELECT DISTINCT `inventory_hostname`
-                FROM Hosts"""
+                FROM Hosts
+                ORDER BY inventory_hostname
+                """
         elif self.args.querygroup:
             self.sql = """
-                SELECT `inventory_hostname`,`ansible_ssh_host`
-                FROM inventory
-                WHERE `group_names`='%s'
-                ORDER BY `inventory_hostname`
+                SELECT hg.group_names, h.inventory_hostname, hd.ansible_hostname, hd.ansible_ssh_host
+                FROM
+                HostDetails AS hd, Hosts AS h, HostGroups AS hg
+                WHERE h.HostId = hd.HostId AND h.HostId = hg.HostId AND hg.group_names = "%s"
+                ORDER BY h.inventory_hostname
                 """ %(self.args.querygroup)
         elif self.args.queryhost:
             self.sql = """
-                SELECT `inventory_hostname`,`ansible_ssh_host`,`group_names`
-                FROM inventory
-                WHERE `inventory_hostname`='%s'
+                SELECT h.inventory_hostname, hd.ansible_hostname, hd.ansible_ssh_host, hg.group_names
+                FROM
+                HostDetails AS hd, Hosts AS h, HostGroups AS hg
+                WHERE h.HostId = hd.HostId AND h.HostId = hg.HostId AND h.inventory_hostname = "%s"
+                ORDER BY hg.group_names
                 """ %(self.args.queryhost)
         elif self.args.queryhostdetails:
             self.sql = """
@@ -64,11 +72,11 @@ class AnsibleMySQL(object):
                 """ %(self.args.queryhostdetails)
         else:
             self.sql = """
-                SELECT
-                `inventory_hostname`,`ansible_ssh_host`,`ansible_distribution`,
-                `ansible_distribution_release`,`ansible_distribution_version`,
-                `group_names`
-                FROM inventory"""
+                SELECT h.inventory_hostname, hg.group_names, hd.*
+                FROM
+                HostDetails AS hd, Hosts AS h, HostGroups AS hg
+                WHERE h.HostId = hd.HostId AND h.HostId = hg.HostId
+                """
 
         self.gather_inventory()
         self.process_results()
