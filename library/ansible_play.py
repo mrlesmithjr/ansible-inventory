@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-play.py: Ansible dynamic inventory
+ansible_play.py: Ansible dynamic inventory
 
 This script will query back-end MySQL DB
 and generate a useable Ansible inventory
