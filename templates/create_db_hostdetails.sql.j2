@@ -3,7 +3,8 @@ INSERT IGNORE INTO Hosts(inventory_hostname) VALUES ('{{ hostvars[item].inventor
 {% endfor %}
 {% for item in groups.all %}
 {%   for grp in hostvars[item].group_names %}
-INSERT IGNORE INTO Groups(group_names) VALUES ('{{ grp }}');
+INSERT IGNORE INTO Groups(`group_names`) VALUES ('all');
+INSERT IGNORE INTO Groups(`group_names`) VALUES ('{{ grp }}');
 {%   endfor %}
 {% endfor %}
 {% for item in groups.all %}
@@ -23,6 +24,13 @@ VALUES( (SELECT HostId FROM Hosts WHERE inventory_hostname='{{ hostvars[item].in
 '{{ hostvars[item].ansible_processor_cores }}','{{ hostvars[item].ansible_processor_count }}','{{ hostvars[item].ansible_memfree_mb }}', \
 '{{ hostvars[item].ansible_memtotal_mb }}','{{ hostvars[item].ansible_nodename }}','{{ hostvars[item].ansible_os_family }}','{{ hostvars[item].ansible_product_name }}', \
 '{{ hostvars[item].ansible_swapfree_mb }}','{{ hostvars[item].ansible_swaptotal_mb }}');
+{% endfor %}
+{% for item in groups.all %}
+INSERT IGNORE INTO HostGroups (GroupId,group_names,HostId,inventory_hostname) \
+VALUES ( (SELECT GroupId FROM Groups WHERE group_names='all'), \
+(SELECT group_names FROM Groups WHERE group_names='all'), \
+(SELECT HostId FROM Hosts Where inventory_hostname='{{ hostvars[item].inventory_hostname }}'), \
+(SELECT inventory_hostname FROM Hosts Where inventory_hostname='{{ hostvars[item].inventory_hostname }}') );
 {% endfor %}
 {% for item in groups.all %}
 {%   for grp in hostvars[item].group_names %}
