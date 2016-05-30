@@ -19,6 +19,9 @@ __status__ = "Development"
 # http://everythingshouldbevirtual.com
 # @mrlesmithjr
 
+"""
+Define vars
+"""
 HOST = '127.0.0.1'
 USER = 'ansible'
 PASSWORD = 'ansible'
@@ -40,6 +43,12 @@ SQL3 = """
     Hosts AS h, HostDetails AS hd
     WHERE h.HostId = hd.HostId
     """
+SQL4 = """
+    SELECT g.group_names, gv.VarName, gv.VarValue
+    FROM
+    Groups as g,GroupVars as gv
+    WHERE g.GroupId = gv.GroupId
+    """
 
 class AnsibleMySQL(object):
     """
@@ -47,9 +56,18 @@ class AnsibleMySQL(object):
     """
 
     def __init__(self):
+        """
+        Init initial inventory
+        """
+        self.inventory = {}
+
+        """
+        Build out inventory structure
+        """
         self.db_connect()
         self.db_query()
         self.group_list()
+        self.group_vars()
         self.host_vars()
         self.display_results()
 
@@ -71,6 +89,8 @@ class AnsibleMySQL(object):
             self.rows2 = self.cur.fetchall()
             self.cur.execute(SQL3)
             self.rows3 = self.cur.fetchall()
+            self.cur.execute(SQL4)
+            self.rows4 = self.cur.fetchall()
         finally:
             self.cur.close()
             self.con.close()
@@ -85,8 +105,6 @@ class AnsibleMySQL(object):
         """
         Build inventory group list
         """
-        self.inventory = {}
-        self.columns = [desc[0] for desc in self.cur.description]
         for self.row in range(len(self.rows)):
             self.hosts = list()
             self.group = (self.rows[self.row][0])
@@ -104,6 +122,20 @@ class AnsibleMySQL(object):
                     self.inventory[self.group] = {
                         'hosts': self.hosts,
                     }
+
+    def group_vars(self):
+        """
+        Gather group vars for each group
+        """
+        for self.row in range(len(self.rows4)):
+            self.groups = (self.rows4[self.row][0])
+            self.inventory[self.groups]['vars'] = {}
+            for self.row4 in range(len(self.rows4)):
+                self.group = self.rows4[self.row4][0]
+                if self.group == self.groups:
+                    self.var = self.rows4[self.row4][1]
+                    self.val = self.rows4[self.row4][2]
+                    self.inventory[self.group]['vars'][self.var] = self.val
 
     def host_vars(self):
         """
