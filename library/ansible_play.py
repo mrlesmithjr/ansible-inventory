@@ -50,7 +50,6 @@ class AnsibleMySQL(object):
         self.db_connect()
         self.db_query()
         self.group_list()
-#        self.group_list_test()
         self.host_vars()
         self.display_results()
 
@@ -82,32 +81,6 @@ class AnsibleMySQL(object):
         """
         print json.dumps(self.inventory, default=datetime_handler, indent=2)
 
-    def group_list_test(self):
-        """
-        Test - This is for testing new functions
-
-        Build inventory group list
-        """
-        self.inventory = {}
-        self.columns = [desc[0] for desc in self.cur.description]
-        for self.row in range(len(self.rows)):
-            self.hosts = list()
-            self.group = (self.rows[self.row][0])
-            self.host = (self.rows[self.row][1])
-            for self.row2 in range(len(self.rows2)):
-                """
-                Gather and compare group names in order to find hosts within
-                the group and build the hosts correctly.
-                """
-                self.group2 = (self.rows2[self.row2][0])
-                self.host2 = (self.rows2[self.row2][1])
-                self.hostvars = {}
-                if self.group2 == self.group:
-                    self.hosts.append(self.host2)
-                    self.inventory[self.group] = {
-                        'hosts': self.hosts,
-                    }
-
     def group_list(self):
         """
         Build inventory group list
@@ -136,7 +109,6 @@ class AnsibleMySQL(object):
         """
         Gather all inventory hostvars
         """
-        self.hosts = []
         self.inventory['_meta'] = {}
         self.inventory['_meta']['hostvars'] = {}
         for self.row3 in range(len(self.rows3)):
