@@ -11,6 +11,7 @@ import datetime
 import json
 import MySQLdb
 
+
 __author__ = "Larry Smith Jr."
 __email___ = "mrlesmithjr@gmail.com"
 __maintainer__ = "Larry Smith Jr."
@@ -50,7 +51,7 @@ class AnsibleMySQL(object):
         self.db_query()
         self.group_list()
 #        self.group_list_test()
-#        self.host_vars()
+        self.host_vars()
         self.display_results()
 
     def db_connect(self):
@@ -135,16 +136,13 @@ class AnsibleMySQL(object):
         """
         Gather all inventory hostvars
         """
+        self.hosts = []
         self.inventory['_meta'] = {}
-        self.inventory['_meta']['hostvars'] = list()
+        self.inventory['_meta']['hostvars'] = {}
         for self.row3 in range(len(self.rows3)):
-            self.host = (self.rows3[self.row3][0])
-            self.ssh_host = (self.rows3[self.row3][1])
-            self.key = {
-                self.host:
-                {'ansible_ssh_host': self.ssh_host},
-            }
-            self.inventory['_meta']['hostvars'].append(self.key)
+            self.host = self.rows3[self.row3][0]
+            self.ssh_host = self.rows3[self.row3][1]
+            self.inventory['_meta']['hostvars'][self.host] = {'ansible_ssh_host': self.ssh_host}
 
 def datetime_handler(obj):
     """
