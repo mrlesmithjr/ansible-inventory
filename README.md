@@ -72,11 +72,124 @@ Example Playbook
     - role: ansible-inventory
   tasks:
 ````
+Example Ansible playbook execution
+----------------------------------
+Using the included python script (library/ansible_play.py) you can  
+use the back-end DB for your dynamic inventory...
+````
+ansible-playbook -i library/ansible_play.py playbook.yml --list-hosts
+
+playbook: playbook.yml
+
+  play #1 (all): all	TAGS: []
+    pattern: [u'all']
+    hosts (5):
+      node1
+      node0
+      node3
+      node2
+      node4
+
+  play #2 (db-nodes): db-nodes	TAGS: []
+    pattern: [u'db-nodes']
+    hosts (1):
+      node0
+
+  play #3 (all): all	TAGS: []
+    pattern: [u'all']
+    hosts (5):
+      node1
+      node0
+      node3
+      node2
+      node4
+
+  play #4 (mixed-nodes): mixed-nodes	TAGS: []
+    pattern: [u'mixed-nodes']
+    hosts (3):
+      node1
+      node2
+      node4
+
+  play #5 (all): all	TAGS: []
+    pattern: [u'all']
+    hosts (5):
+      node1
+      node0
+      node3
+      node2
+      node4
+````
+To view the contents of the dynamic inventory...
+````
+./library/ansible_play.py                                      
+{
+  "test-nodes": {
+    "hosts": [
+      "node3",
+      "node1",
+      "node2"
+    ]
+  },
+  "_meta": {
+    "hostvars": {
+      "node1": {
+        "ansible_ssh_host": "172.28.128.4"
+      },
+      "node0": {
+        "ansible_ssh_host": "172.28.128.3"
+      },
+      "node3": {
+        "ansible_ssh_host": "172.28.128.6"
+      },
+      "node2": {
+        "ansible_ssh_host": "172.28.128.5"
+      },
+      "node4": {
+        "ansible_ssh_host": "172.28.128.7"
+      }
+    }
+  },
+  "db-nodes": {
+    "hosts": [
+      "node0"
+    ],
+    "vars": {
+      "TestVar": "HelloVar"
+    }
+  },
+  "renamed-nodes": {
+    "hosts": [
+      "node1"
+    ]
+  },
+  "mixed-nodes": {
+    "hosts": [
+      "node1",
+      "node2",
+      "node4"
+    ],
+    "vars": {
+      "NoVar": "NoVal"
+    }
+  },
+  "ungrouped": {
+    "hosts": [
+      "node2"
+    ]
+  },
+  "random-nodes": {
+    "hosts": [
+      "node4"
+    ]
+  }
+}
+````
 
 Example Queries
 ---------------
-Using the included python script to execute queries. (In all of the example
-  outputs I am using jq to show pretty JSON.)
+Using the included python script (library/ansible_inventory.py) to execute  
+queries.
 
 ````
 library/ansible_inventory.py
@@ -112,7 +225,7 @@ optional arguments:
 ````
 Default query...
 ````
-ansible_inventory.py --user ansible --password ansible | jq
+ansible_inventory.py --user ansible --password ansible
 ````
 ````
 [
@@ -330,7 +443,7 @@ ansible_inventory.py --user ansible --password ansible | jq
 ````
 Query all groups...
 ````
-ansible_inventory.py --user ansible --password ansible --allgroups | jq
+ansible_inventory.py --user ansible --password ansible --allgroups
 ````
 ````
 [
@@ -350,7 +463,7 @@ ansible_inventory.py --user ansible --password ansible --allgroups | jq
 ````
 Query all hosts...
 ````
-ansible_inventory.py --user ansible --password ansible --allhosts | jq
+ansible_inventory.py --user ansible --password ansible --allhosts
 ````
 ````
 [
@@ -373,7 +486,7 @@ ansible_inventory.py --user ansible --password ansible --allhosts | jq
 ````
 Query a specific group...
 ````
-ansible_inventory.py --user ansible --password ansible --querygroup test-nodes | jq
+ansible_inventory.py --user ansible --password ansible --querygroup test-nodes
 ````
 ````
 [
@@ -399,7 +512,7 @@ ansible_inventory.py --user ansible --password ansible --querygroup test-nodes |
 ````
 Query a specific host...
 ````
-ansible_inventory.py --user ansible --password ansible --queryhost node1 | jq
+ansible_inventory.py --user ansible --password ansible --queryhost node1
 ````
 ````
 [
@@ -419,7 +532,7 @@ ansible_inventory.py --user ansible --password ansible --queryhost node1 | jq
 ````
 Query a specific host for all details...
 ````
-ansible_inventory.py --user ansible --password ansible --queryhostdetails node1 | jq
+ansible_inventory.py --user ansible --password ansible --queryhostdetails node1
 ````
 ````
 [
