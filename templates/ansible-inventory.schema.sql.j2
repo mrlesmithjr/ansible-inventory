@@ -73,7 +73,6 @@ CREATE TABLE `GroupVars` (
   `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `GroupId` int(11) NOT NULL,
   PRIMARY KEY (`VarsId`),
-  UNIQUE KEY `VarName` (`VarName`),
   KEY `GroupId` (`GroupId`),
   CONSTRAINT `GroupVars_ibfk_1` FOREIGN KEY (`GroupId`) REFERENCES `Groups` (`GroupId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -93,7 +92,6 @@ CREATE TABLE `HostVars` (
   `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `HostId` int(11) NOT NULL,
   PRIMARY KEY (`VarsId`),
-  UNIQUE KEY `VarName` (`VarName`),
   KEY `HostId` (`HostId`),
   CONSTRAINT `HostVars_ibfk_1` FOREIGN KEY (`HostId`) REFERENCES `Hosts` (`HostId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

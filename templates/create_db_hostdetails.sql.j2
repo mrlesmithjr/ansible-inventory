@@ -75,3 +75,17 @@ VALUES( (SELECT HostId FROM Hosts WHERE inventory_hostname='{{ item.name }}'), '
 {%     endif %}
 {%   endfor %}
 {% endif %}
+
+{%   for item in groups.all %}
+REPLACE INTO HostVars(`HostId`,`VarName`,`VarValue` )
+VALUES ((SELECT HostId FROM Hosts where inventory_hostname='{{ hostvars[item].inventory_hostname }}'),'ansible_ssh_host','{{ hostvars[item].ansible_ssh_host }}');
+{%   endfor %}
+
+{% if inventory_host_vars is defined %}
+{%   for item in inventory_host_vars %}
+{%     for var in item.vars %}
+REPLACE INTO HostVars(`HostId`,`VarName`,`VarValue` )
+VALUES ((SELECT HostId FROM Hosts where inventory_hostname='{{ item.host }}'),'{{ var.name }}','{{ var.value }}');
+{%     endfor %}
+{%   endfor %}
+{% endif %}

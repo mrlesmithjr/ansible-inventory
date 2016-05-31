@@ -38,10 +38,10 @@ SQL2 = """
     HostGroups
     """
 SQL3 = """
-    SELECT DISTINCT h.inventory_hostname, hd.ansible_ssh_host
+    SELECT h.inventory_hostname, hv.VarName, hv.VarValue
     FROM
-    Hosts AS h, HostDetails AS hd
-    WHERE h.HostId = hd.HostId
+    Hosts as h,HostVars as hv
+    WHERE h.HostId = hv.HostId
     """
 SQL4 = """
     SELECT g.group_names, gv.VarName, gv.VarValue
@@ -143,10 +143,16 @@ class AnsibleMySQL(object):
         """
         self.inventory['_meta'] = {}
         self.inventory['_meta']['hostvars'] = {}
-        for self.row3 in range(len(self.rows3)):
-            self.host = self.rows3[self.row3][0]
-            self.ssh_host = self.rows3[self.row3][1]
-            self.inventory['_meta']['hostvars'][self.host] = {'ansible_ssh_host': self.ssh_host}
+        for self.row in range(len(self.rows3)):
+            self.hosts = self.rows3[self.row][0]
+            self.ssh_host = self.rows3[self.row][1]
+            self.inventory['_meta']['hostvars'][self.hosts] = {}
+            for self.row3 in range(len(self.rows3)):
+                self.host = self.rows3[self.row3][0]
+                if self.host == self.hosts:
+                    self.var = self.rows3[self.row3][1]
+                    self.val = self.rows3[self.row3][2]
+                    self.inventory['_meta']['hostvars'][self.host][self.var] = self.val
 
 def datetime_handler(obj):
     """
