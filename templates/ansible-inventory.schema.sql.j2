@@ -1,27 +1,39 @@
--- MySQL dump 10.15  Distrib 10.0.25-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: ansible_inventory
--- ------------------------------------------------------
--- Server version	10.0.25-MariaDB-1~trusty
+-- Table structure for table `Groups`
+--
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `Groups`;
+CREATE TABLE `Groups` (
+  `GroupId` int(11) NOT NULL AUTO_INCREMENT,
+  `group_names` varchar(255) NOT NULL,
+  `GroupDescription` varchar(255) DEFAULT NULL,
+  `GroupDTAP` char(1) DEFAULT '',
+  `GroupCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`GroupId`),
+  UNIQUE KEY `group_names` (`group_names`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `Hosts`
+--
+
+DROP TABLE IF EXISTS `Hosts`;
+CREATE TABLE `Hosts` (
+  `HostId` int(11) NOT NULL AUTO_INCREMENT,
+  `inventory_hostname` varchar(255) NOT NULL,
+  `HostDescription` varchar(255) DEFAULT NULL,
+  `HostCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`HostId`),
+  UNIQUE KEY `inventory_hostname` (`inventory_hostname`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `AnsiblePlaybooks`
 --
 
 DROP TABLE IF EXISTS `AnsiblePlaybooks`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `AnsiblePlaybooks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `Name` varchar(255) NOT NULL,
@@ -31,15 +43,12 @@ CREATE TABLE `AnsiblePlaybooks` (
   UNIQUE KEY `Name` (`Name`),
   UNIQUE KEY `Path` (`Path`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `GroupContact`
 --
 
 DROP TABLE IF EXISTS `GroupContact`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `GroupContact` (
   `ContactId` int(11) NOT NULL AUTO_INCREMENT,
   `ContactName` varchar(255) NOT NULL,
@@ -54,15 +63,12 @@ CREATE TABLE `GroupContact` (
   KEY `GroupId` (`GroupId`),
   CONSTRAINT `GroupContact_ibfk_1` FOREIGN KEY (`GroupId`) REFERENCES `Groups` (`GroupId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `GroupVars`
 --
 
 DROP TABLE IF EXISTS `GroupVars`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `GroupVars` (
   `VarsId` int(11) NOT NULL AUTO_INCREMENT,
   `VarName` varchar(255) NOT NULL,
@@ -115,31 +121,10 @@ CREATE TABLE `ChildHostVars` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `Groups`
---
-
-DROP TABLE IF EXISTS `Groups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Groups` (
-  `GroupId` int(11) NOT NULL AUTO_INCREMENT,
-  `group_names` varchar(255) NOT NULL,
-  `GroupDescription` varchar(255) DEFAULT NULL,
-  `GroupDTAP` char(1) DEFAULT '',
-  `GroupCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`GroupId`),
-  UNIQUE KEY `group_names` (`group_names`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `HostDetails`
 --
 
 DROP TABLE IF EXISTS `HostDetails`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `HostDetails` (
   `HostDetailsId` int(11) NOT NULL AUTO_INCREMENT,
   `ansible_architecture` varchar(255) DEFAULT NULL,
@@ -177,15 +162,12 @@ CREATE TABLE `HostDetails` (
   UNIQUE KEY `HostId` (`HostId`),
   CONSTRAINT `HostDetails_ibfk_1` FOREIGN KEY (`HostId`) REFERENCES `Hosts` (`HostId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `HostGroups`
 --
 
 DROP TABLE IF EXISTS `HostGroups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `HostGroups` (
   `HostGroupId` int(11) NOT NULL AUTO_INCREMENT,
   `GroupId` int(11) NOT NULL,
@@ -198,34 +180,6 @@ CREATE TABLE `HostGroups` (
   CONSTRAINT `HostGroups_ibfk_1` FOREIGN KEY (`GroupId`) REFERENCES `Groups` (`GroupId`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `HostGroups_ibfk_2` FOREIGN KEY (`HostId`) REFERENCES `Hosts` (`HostId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Hosts`
---
-
-DROP TABLE IF EXISTS `Hosts`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Hosts` (
-  `HostId` int(11) NOT NULL AUTO_INCREMENT,
-  `inventory_hostname` varchar(255) NOT NULL,
-  `HostDescription` varchar(255) DEFAULT NULL,
-  `HostCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`HostId`),
-  UNIQUE KEY `inventory_hostname` (`inventory_hostname`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 CREATE OR REPLACE VIEW `inventory`
 AS SELECT
@@ -237,5 +191,3 @@ AS SELECT
    `hd`.`ansible_distribution_version` AS `ansible_distribution_version`,
    `hd`.`LastUpdateTime` AS `LastUpdateTime`
 FROM ((`Hosts` `h` join `HostDetails` `hd` on((`h`.`HostId` = `hd`.`HostId`))) join `HostGroups` `hg` on((`hd`.`HostId` = `hg`.`HostId`))) order by `h`.`inventory_hostname`;
-
--- Dump completed on 2016-05-21 16:50:32
