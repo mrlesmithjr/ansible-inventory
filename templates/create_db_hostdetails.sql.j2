@@ -1,18 +1,3 @@
-{% if inventory_hosts is defined %}
-{%   for item in inventory_hosts %}
-INSERT IGNORE INTO Hosts(`inventory_hostname`) VALUES ('{{ item.name }}');
-INSERT IGNORE INTO HostGroups(`GroupId`,`group_names`,`HostId`,`inventory_hostname`) \
-VALUES ( (SELECT GroupId FROM Groups WHERE group_names='all'), \
-(SELECT group_names FROM Groups WHERE group_names='all'), \
-(SELECT HostId FROM Hosts Where inventory_hostname='{{ item.name }}'), \
-(SELECT inventory_hostname FROM Hosts Where inventory_hostname='{{ item.name }}') );
-{%     if item.ip is defined %}
-REPLACE INTO HostDetails(`HostId`,`ansible_ssh_host`) \
-VALUES( (SELECT HostId FROM Hosts WHERE inventory_hostname='{{ item.name }}'), '{{ item.ip }}');
-{%     endif %}
-{%   endfor %}
-{% endif %}
-
 {% for item in groups.all %}
 INSERT IGNORE INTO Hosts(`inventory_hostname`) VALUES ('{{ hostvars[item].inventory_hostname }}');
 {% endfor %}
@@ -74,4 +59,19 @@ REPLACE INTO GroupVars(`GroupId`,`VarName`,`VarValue`) \
 VALUES ((SELECT GroupId FROM Groups WHERE group_names='{{ item.group }}'),'{{ var.name }}','{{ var.value }}');
 {%     endfor %}
 {%    endfor %}
+{% endif %}
+
+{% if inventory_hosts is defined %}
+{%   for item in inventory_hosts %}
+INSERT IGNORE INTO Hosts(`inventory_hostname`) VALUES ('{{ item.name }}');
+INSERT IGNORE INTO HostGroups(`GroupId`,`group_names`,`HostId`,`inventory_hostname`) \
+VALUES ( (SELECT GroupId FROM Groups WHERE group_names='all'), \
+(SELECT group_names FROM Groups WHERE group_names='all'), \
+(SELECT HostId FROM Hosts Where inventory_hostname='{{ item.name }}'), \
+(SELECT inventory_hostname FROM Hosts Where inventory_hostname='{{ item.name }}') );
+{%     if item.ip is defined %}
+REPLACE INTO HostDetails(`HostId`,`ansible_ssh_host`) \
+VALUES( (SELECT HostId FROM Hosts WHERE inventory_hostname='{{ item.name }}'), '{{ item.ip }}');
+{%     endif %}
+{%   endfor %}
 {% endif %}
