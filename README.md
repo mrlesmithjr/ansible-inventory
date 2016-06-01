@@ -169,12 +169,22 @@ To view the contents of the dynamic inventory...
 ````
 ./library/ansible_play.py                                      
 {
-  "test-nodes": {
+  "all": {
     "hosts": [
-      "node3",
+      "node2",
+      "node0",
       "node1",
-      "node2"
-    ]
+      "node4",
+      "node3",
+      "test-node-01",
+      "test-node-02"
+    ],
+    "vars": {
+      "sec_dns": "8.8.4.4",
+      "pri_domain_name": "vagrant.local",
+      "pri_dns": "8.8.8.8",
+      "email_notifications": "mrlesmithjr@gmail.com"
+    }
   },
   "_meta": {
     "hostvars": {
@@ -182,16 +192,26 @@ To view the contents of the dynamic inventory...
         "ansible_ssh_host": "172.28.128.4"
       },
       "node0": {
-        "ansible_ssh_host": "172.28.128.3"
+        "ansible_ssh_host": "172.28.128.3",
+        "es_packetbeat_interface": "eth0",
+        "parentvar": {
+          "childvar": "childval"
+        },
+        "ansiblevar": "ansibleval"
       },
       "node3": {
         "ansible_ssh_host": "172.28.128.6"
       },
       "node2": {
-        "ansible_ssh_host": "172.28.128.5"
+        "ansible_ssh_host": "172.28.128.5",
+        "es_packetbeat_interface": "any"
       },
       "node4": {
-        "ansible_ssh_host": "172.28.128.7"
+        "ansible_ssh_host": "172.28.128.7",
+        "SNMP_Communities": {
+          "Allowed_From": "10.0.0.0/24",
+          "community": "Public"
+        }
       }
     }
   },
@@ -200,7 +220,8 @@ To view the contents of the dynamic inventory...
       "node0"
     ],
     "vars": {
-      "TestVar": "HelloVar"
+      "mysql_root_password": "root",
+      "mysql_allow_remote_connections": "true"
     }
   },
   "renamed-nodes": {
@@ -211,16 +232,17 @@ To view the contents of the dynamic inventory...
   "mixed-nodes": {
     "hosts": [
       "node1",
-      "node2",
       "node4"
-    ],
-    "vars": {
-      "NoVar": "NoVal"
-    }
+    ]
   },
   "ungrouped": {
     "hosts": [
       "node2"
+    ]
+  },
+  "test-nodes": {
+    "hosts": [
+      "node3"
     ]
   },
   "random-nodes": {
