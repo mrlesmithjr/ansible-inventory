@@ -55,8 +55,8 @@ CREATE TABLE `GroupContact` (
   `ContactEmail` varchar(255) NOT NULL,
   `ContactPhone` varchar(255) NOT NULL,
   `ContactCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `GroupId` int(11) NOT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`ContactId`),
   UNIQUE KEY `ContactName` (`ContactName`),
   UNIQUE KEY `ContactEmail` (`ContactEmail`),
@@ -76,9 +76,10 @@ CREATE TABLE `GroupVars` (
   `VarReference` varchar(255) DEFAULT '',
   `VarSet` varchar(255) DEFAULT '',
   `VarValue` varchar(255) NOT NULL,
-  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `GroupId` int(11) NOT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`VarsId`),
+  UNIQUE KEY `GroupId_2` (`GroupId`,`VarName`),
   KEY `GroupId` (`GroupId`),
   CONSTRAINT `GroupVars_ibfk_1` FOREIGN KEY (`GroupId`) REFERENCES `Groups` (`GroupId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -95,11 +96,11 @@ CREATE TABLE `HostVars` (
   `VarReference` varchar(255) DEFAULT '',
   `VarSet` varchar(255) DEFAULT '',
   `VarValue` varchar(255) NOT NULL,
-  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `HostId` int(11) NOT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`VarsId`),
-  KEY `HostId` (`HostId`),
-  CONSTRAINT `HostVars_ibfk_1` FOREIGN KEY (`HostId`) REFERENCES `Hosts` (`HostId`) ON DELETE CASCADE ON UPDATE CASCADE
+  UNIQUE KEY `HostId_2` (`HostId`,`VarName`,`VarValue`),
+  KEY `HostId` (`HostId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -114,8 +115,10 @@ CREATE TABLE `ChildHostVars` (
   `VarReference` varchar(255) DEFAULT '',
   `VarSet` varchar(255) DEFAULT '',
   `VarValue` varchar(255) NOT NULL,
-  `ParentVarsId` int(11) DEFAULT NULL,
+  `ParentVarsId` int(11) NOT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`VarsId`),
+  UNIQUE KEY `ParentVarsId_2` (`ParentVarsId`,`VarName`,`VarValue`),
   KEY `ParentVarsId` (`ParentVarsId`),
   CONSTRAINT `ChildHostVars_ibfk_1` FOREIGN KEY (`ParentVarsId`) REFERENCES `HostVars` (`VarsId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -155,8 +158,8 @@ CREATE TABLE `HostDetails` (
   `ansible_swaptotal_mb` int(11) DEFAULT NULL,
   `ansible_system_vendor` varchar(255) DEFAULT NULL,
   `ansible_virtualization_type` varchar(255) DEFAULT NULL,
-  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `HostId` int(11) DEFAULT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`HostDetailsId`),
   UNIQUE KEY `ansible_fqdn` (`ansible_fqdn`),
   UNIQUE KEY `HostId` (`HostId`),
@@ -174,6 +177,7 @@ CREATE TABLE `HostGroups` (
   `group_names` varchar(255) NOT NULL,
   `HostId` int(11) NOT NULL,
   `inventory_hostname` varchar(255) NOT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`HostGroupId`),
   UNIQUE KEY `HostId` (`HostId`,`GroupId`),
   KEY `GroupId` (`GroupId`),
