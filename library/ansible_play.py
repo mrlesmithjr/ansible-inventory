@@ -49,6 +49,11 @@ SQL4 = """
     Groups as g,GroupVars as gv
     WHERE g.GroupId = gv.GroupId
     """
+SQL5 = """
+    SELECT hv.VarName,chv.VarName,chv.VarValue,h.inventory_hostname
+    FROM ChildHostVars as chv,HostVars as hv, Hosts as h
+    WHERE hv.VarsId = chv.ParentVarsId AND hv.HostId = h.HostId
+    """
 
 class AnsibleMySQL(object):
     """
@@ -67,8 +72,9 @@ class AnsibleMySQL(object):
         self.db_connect()
         self.db_query()
         self.group_list()
-        self.group_vars()
-        self.host_vars()
+        self.groupvars()
+        self.parent_hostvars()
+        self.child_hostvars()
         self.display_results()
 
     def db_connect(self):
@@ -91,6 +97,8 @@ class AnsibleMySQL(object):
             self.rows3 = self.cur.fetchall()
             self.cur.execute(SQL4)
             self.rows4 = self.cur.fetchall()
+            self.cur.execute(SQL5)
+            self.rows5 = self.cur.fetchall()
         finally:
             self.cur.close()
             self.con.close()
@@ -123,9 +131,9 @@ class AnsibleMySQL(object):
                         'hosts': self.hosts,
                     }
 
-    def group_vars(self):
+    def groupvars(self):
         """
-        Gather group vars for each group
+        Gather groupvars for each group
         """
         for self.row in range(len(self.rows4)):
             self.groups = (self.rows4[self.row][0])
@@ -137,15 +145,16 @@ class AnsibleMySQL(object):
                     self.val = self.rows4[self.row4][2]
                     self.inventory[self.group]['vars'][self.var] = self.val
 
-    def host_vars(self):
+    def parent_hostvars(self):
         """
-        Gather all inventory hostvars
+        Gather parent hostvars
+
+        Gathers all parent level hostvars and displays them...
         """
         self.inventory['_meta'] = {}
         self.inventory['_meta']['hostvars'] = {}
         for self.row in range(len(self.rows3)):
             self.hosts = self.rows3[self.row][0]
-            self.ssh_host = self.rows3[self.row][1]
             self.inventory['_meta']['hostvars'][self.hosts] = {}
             for self.row3 in range(len(self.rows3)):
                 self.host = self.rows3[self.row3][0]
@@ -153,6 +162,24 @@ class AnsibleMySQL(object):
                     self.var = self.rows3[self.row3][1]
                     self.val = self.rows3[self.row3][2]
                     self.inventory['_meta']['hostvars'][self.host][self.var] = self.val
+
+    def child_hostvars(self):
+        """
+        Gather child hostvars
+
+        Gathers all child hostvars which map to their respective parent level
+        hostvars and displays them...
+        """
+        for self.row in range(len(self.rows5)):
+            self.hosts = self.rows5[self.row][3]
+            self.parvar = self.rows5[self.row][0]
+            self.inventory['_meta']['hostvars'][self.hosts][self.parvar] = {}
+            for self.row5 in range(len(self.rows5)):
+                self.host = self.rows5[self.row5][3]
+                if self.hosts == self.host:
+                    self.var = self.rows5[self.row5][1]
+                    self.val = self.rows5[self.row5][2]
+                    self.inventory['_meta']['hostvars'][self.host][self.parvar][self.var] = self.val
 
 def datetime_handler(obj):
     """
