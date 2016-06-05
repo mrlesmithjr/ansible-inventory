@@ -267,375 +267,182 @@ Show script help..
 ansible_inventory.py -h
 ````
 ````
-usage: ansible_inventory.py [-h] [--all] [--allgroups] [--allhosts] [--db DB]
-                            [--host HOST] --password PASSWORD
-                            [--querygroup QUERYGROUP] [--queryhost QUERYHOST]
-                            [--queryhostdetails QUERYHOSTDETAILS] --user USER
+usage: ansible_inventory.py [-h] [--dbhost DBHOST] [--dbname DBNAME]
+                            --dbpassword DBPASSWORD --dbuser DBUSER
+                            [--group GROUP] [--host HOST]
+                            {queryall,queryallgroups,queryallhosts,querygroup,queryhost,queryhostdetails}
 
 Ansible Inventory...
 
+positional arguments:
+  {queryall,queryallgroups,queryallhosts,querygroup,queryhost,queryhostdetails}
+                        Define action to take
+
 optional arguments:
   -h, --help            show this help message and exit
-  --all                 Display all inventory items
-  --allgroups           Display all groups
-  --allhosts            Display all hosts
-  --db DB               Database Name
-  --host HOST           Database Host, [default: 127.0.0.1]
-  --password PASSWORD   Database Password
-  --querygroup QUERYGROUP
-                        Query Group, Define Group to Query
-  --queryhost QUERYHOST
-                        Query Host, Define Host to Query
-  --queryhostdetails QUERYHOSTDETAILS
-                        Query Host Full Details, Define Host to Query
-  --user USER           Database User
-````
-Default query...
-````
-ansible_inventory.py --user ansible --password ansible
-````
-````
-[
-  {
-    "HostDetailsId": 1,
-    "HostId": 1,
-    "LastUpdateTime": "2016-05-25T18:01:07",
-    "ansible_architecture": "x86_64",
-    "ansible_bios_date": "12/01/2006",
-    "ansible_bios_version": "VirtualBox",
-    "ansible_date_time.tz": "EDT",
-    "ansible_default_ipv4.address": "10.0.2.15",
-    "ansible_default_ipv4.gateway": "10.0.2.2",
-    "ansible_default_ipv4.interface": "eth0",
-    "ansible_default_ipv4.macaddress": "08:00:27:55:7c:f9",
-    "ansible_default_ipv4.netmask": "255.255.255.0",
-    "ansible_distribution": "Ubuntu",
-    "ansible_distribution_release": "trusty",
-    "ansible_distribution_version": "14.04",
-    "ansible_fqdn": "node0",
-    "ansible_hostname": "node0",
-    "ansible_kernel": "4.2.0-30-generic",
-    "ansible_memfree_mb": 108,
-    "ansible_memtotal_mb": 489,
-    "ansible_nodename": "node0",
-    "ansible_os_family": "Debian",
-    "ansible_processor": "GenuineIntelIntel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz",
-    "ansible_processor_cores": 1,
-    "ansible_processor_count": 1,
-    "ansible_product_name": "VirtualBox",
-    "ansible_ssh_host": "172.28.128.60",
-    "ansible_swapfree_mb": 502,
-    "ansible_swaptotal_mb": 511,
-    "ansible_system_vendor": "innotek GmbH",
-    "ansible_virtualization_type": "virtualbox",
-    "group_names": "db-nodes",
-    "inventory_hostname": "node0"
-  },
-  {
-    "HostDetailsId": 2,
-    "HostId": 2,
-    "LastUpdateTime": "2016-05-25T18:01:07",
-    "ansible_architecture": "x86_64",
-    "ansible_bios_date": "12/01/2006",
-    "ansible_bios_version": "VirtualBox",
-    "ansible_date_time.tz": "EDT",
-    "ansible_default_ipv4.address": "10.0.2.15",
-    "ansible_default_ipv4.gateway": "10.0.2.2",
-    "ansible_default_ipv4.interface": "eth0",
-    "ansible_default_ipv4.macaddress": "08:00:27:a0:a8:23",
-    "ansible_default_ipv4.netmask": "255.255.255.0",
-    "ansible_distribution": "Debian",
-    "ansible_distribution_release": "jessie",
-    "ansible_distribution_version": "8.3",
-    "ansible_fqdn": "node1",
-    "ansible_hostname": "node1",
-    "ansible_kernel": "3.16.0-4-amd64",
-    "ansible_memfree_mb": 78,
-    "ansible_memtotal_mb": 494,
-    "ansible_nodename": "node1",
-    "ansible_os_family": "Debian",
-    "ansible_processor": "GenuineIntelIntel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz",
-    "ansible_processor_cores": 1,
-    "ansible_processor_count": 1,
-    "ansible_product_name": "VirtualBox",
-    "ansible_ssh_host": "172.28.128.56",
-    "ansible_swapfree_mb": 1020,
-    "ansible_swaptotal_mb": 1020,
-    "ansible_system_vendor": "innotek GmbH",
-    "ansible_virtualization_type": "virtualbox",
-    "group_names": "mixed-nodes",
-    "inventory_hostname": "node1"
-  },
-  {
-    "HostDetailsId": 2,
-    "HostId": 2,
-    "LastUpdateTime": "2016-05-25T18:01:07",
-    "ansible_architecture": "x86_64",
-    "ansible_bios_date": "12/01/2006",
-    "ansible_bios_version": "VirtualBox",
-    "ansible_date_time.tz": "EDT",
-    "ansible_default_ipv4.address": "10.0.2.15",
-    "ansible_default_ipv4.gateway": "10.0.2.2",
-    "ansible_default_ipv4.interface": "eth0",
-    "ansible_default_ipv4.macaddress": "08:00:27:a0:a8:23",
-    "ansible_default_ipv4.netmask": "255.255.255.0",
-    "ansible_distribution": "Debian",
-    "ansible_distribution_release": "jessie",
-    "ansible_distribution_version": "8.3",
-    "ansible_fqdn": "node1",
-    "ansible_hostname": "node1",
-    "ansible_kernel": "3.16.0-4-amd64",
-    "ansible_memfree_mb": 78,
-    "ansible_memtotal_mb": 494,
-    "ansible_nodename": "node1",
-    "ansible_os_family": "Debian",
-    "ansible_processor": "GenuineIntelIntel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz",
-    "ansible_processor_cores": 1,
-    "ansible_processor_count": 1,
-    "ansible_product_name": "VirtualBox",
-    "ansible_ssh_host": "172.28.128.56",
-    "ansible_swapfree_mb": 1020,
-    "ansible_swaptotal_mb": 1020,
-    "ansible_system_vendor": "innotek GmbH",
-    "ansible_virtualization_type": "virtualbox",
-    "group_names": "test-nodes",
-    "inventory_hostname": "node1"
-  },
-  {
-    "HostDetailsId": 3,
-    "HostId": 3,
-    "LastUpdateTime": "2016-05-25T18:01:07",
-    "ansible_architecture": "x86_64",
-    "ansible_bios_date": "12/01/2006",
-    "ansible_bios_version": "VirtualBox",
-    "ansible_date_time.tz": "EDT",
-    "ansible_default_ipv4.address": "10.0.2.15",
-    "ansible_default_ipv4.gateway": "10.0.2.2",
-    "ansible_default_ipv4.interface": "eth0",
-    "ansible_default_ipv4.macaddress": "08:00:27:55:7c:f9",
-    "ansible_default_ipv4.netmask": "255.255.255.0",
-    "ansible_distribution": "Ubuntu",
-    "ansible_distribution_release": "trusty",
-    "ansible_distribution_version": "14.04",
-    "ansible_fqdn": "node2",
-    "ansible_hostname": "node2",
-    "ansible_kernel": "4.2.0-30-generic",
-    "ansible_memfree_mb": 79,
-    "ansible_memtotal_mb": 489,
-    "ansible_nodename": "node2",
-    "ansible_os_family": "Debian",
-    "ansible_processor": "GenuineIntelIntel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz",
-    "ansible_processor_cores": 1,
-    "ansible_processor_count": 1,
-    "ansible_product_name": "VirtualBox",
-    "ansible_ssh_host": "172.28.128.57",
-    "ansible_swapfree_mb": 510,
-    "ansible_swaptotal_mb": 511,
-    "ansible_system_vendor": "innotek GmbH",
-    "ansible_virtualization_type": "virtualbox",
-    "group_names": "mixed-nodes",
-    "inventory_hostname": "node2"
-  },
-  {
-    "HostDetailsId": 3,
-    "HostId": 3,
-    "LastUpdateTime": "2016-05-25T18:01:07",
-    "ansible_architecture": "x86_64",
-    "ansible_bios_date": "12/01/2006",
-    "ansible_bios_version": "VirtualBox",
-    "ansible_date_time.tz": "EDT",
-    "ansible_default_ipv4.address": "10.0.2.15",
-    "ansible_default_ipv4.gateway": "10.0.2.2",
-    "ansible_default_ipv4.interface": "eth0",
-    "ansible_default_ipv4.macaddress": "08:00:27:55:7c:f9",
-    "ansible_default_ipv4.netmask": "255.255.255.0",
-    "ansible_distribution": "Ubuntu",
-    "ansible_distribution_release": "trusty",
-    "ansible_distribution_version": "14.04",
-    "ansible_fqdn": "node2",
-    "ansible_hostname": "node2",
-    "ansible_kernel": "4.2.0-30-generic",
-    "ansible_memfree_mb": 79,
-    "ansible_memtotal_mb": 489,
-    "ansible_nodename": "node2",
-    "ansible_os_family": "Debian",
-    "ansible_processor": "GenuineIntelIntel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz",
-    "ansible_processor_cores": 1,
-    "ansible_processor_count": 1,
-    "ansible_product_name": "VirtualBox",
-    "ansible_ssh_host": "172.28.128.57",
-    "ansible_swapfree_mb": 510,
-    "ansible_swaptotal_mb": 511,
-    "ansible_system_vendor": "innotek GmbH",
-    "ansible_virtualization_type": "virtualbox",
-    "group_names": "test-nodes",
-    "inventory_hostname": "node2"
-  },
-  {
-    "HostDetailsId": 5,
-    "HostId": 5,
-    "LastUpdateTime": "2016-05-25T18:01:07",
-    "ansible_architecture": "x86_64",
-    "ansible_bios_date": "12/01/2006",
-    "ansible_bios_version": "VirtualBox",
-    "ansible_date_time.tz": "EDT",
-    "ansible_default_ipv4.address": "10.0.2.15",
-    "ansible_default_ipv4.gateway": "10.0.2.2",
-    "ansible_default_ipv4.interface": "enp0s3",
-    "ansible_default_ipv4.macaddress": "08:00:27:af:3a:e6",
-    "ansible_default_ipv4.netmask": "255.255.255.0",
-    "ansible_distribution": "CentOS",
-    "ansible_distribution_release": "Core",
-    "ansible_distribution_version": "7.2.1511",
-    "ansible_fqdn": "localhost.localdomain",
-    "ansible_hostname": "node3",
-    "ansible_kernel": "3.10.0-327.13.1.el7.x86_64",
-    "ansible_memfree_mb": 403,
-    "ansible_memtotal_mb": 992,
-    "ansible_nodename": "node3",
-    "ansible_os_family": "RedHat",
-    "ansible_processor": "GenuineIntelIntel(R) Core(TM) i7-4870HQ CPU @ 2.50GHzGenuineIntelIntel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz",
-    "ansible_processor_cores": 2,
-    "ansible_processor_count": 1,
-    "ansible_product_name": "VirtualBox",
-    "ansible_ssh_host": "172.28.128.58",
-    "ansible_swapfree_mb": 1023,
-    "ansible_swaptotal_mb": 1023,
-    "ansible_system_vendor": "innotek GmbH",
-    "ansible_virtualization_type": "virtualbox",
-    "group_names": "test-nodes",
-    "inventory_hostname": "node3"
-  }
-]
+  --dbhost DBHOST       Database Host, [default: 127.0.0.1]
+  --dbname DBNAME       Database Name, [default: ansible_inventory]
+  --dbpassword DBPASSWORD
+                        Database Password
+  --dbuser DBUSER       Database User
+  --group GROUP         Query Group, Define Group to Query
+  --host HOST           Query Host, Define Host to Query
 ````
 Query all groups...
 ````
-ansible_inventory.py --user ansible --password ansible --allgroups
+ansible_inventory.py queryallgroups --dbuser ansible --dbpassword ansible
 ````
 ````
 [
-  {
-    "group_names": "db-nodes"
-  },
-  {
-    "group_names": "mixed-nodes"
-  },
-  {
-    "group_names": "random-nodes"
-  },
-  {
-    "group_names": "test-nodes"
-  }
+    {
+        "group_names": "all"
+    },
+    {
+        "group_names": "db-nodes"
+    },
+    {
+        "group_names": "elk-nodes"
+    },
+    {
+        "group_names": "mixed-nodes"
+    },
+    {
+        "group_names": "openstack-nodes"
+    },
+    {
+        "group_names": "random-nodes"
+    },
+    {
+        "group_names": "renamed-nodes"
+    },
+    {
+        "group_names": "test-nodes"
+    },
+    {
+        "group_names": "ungrouped"
+    }
 ]
 ````
 Query all hosts...
 ````
-ansible_inventory.py --user ansible --password ansible --allhosts
+ansible_inventory.py queryallhosts --dbuser ansible --dbpassword ansible
 ````
 ````
 [
-  {
-    "inventory_hostname": "node0"
-  },
-  {
-    "inventory_hostname": "node1"
-  },
-  {
-    "inventory_hostname": "node2"
-  },
-  {
-    "inventory_hostname": "node3"
-  },
-  {
-    "inventory_hostname": "node4"
-  }
+    {
+        "inventory_hostname": "jumpbox"
+    },
+    {
+        "inventory_hostname": "node0"
+    },
+    {
+        "inventory_hostname": "node1"
+    },
+    {
+        "inventory_hostname": "node2"
+    },
+    {
+        "inventory_hostname": "node3"
+    },
+    {
+        "inventory_hostname": "node4"
+    },
+    {
+        "inventory_hostname": "smtp"
+    },
+    {
+        "inventory_hostname": "test-node-01"
+    },
+    {
+        "inventory_hostname": "test-node-02"
+    }
 ]
 ````
 Query a specific group...
 ````
-ansible_inventory.py --user ansible --password ansible --querygroup test-nodes
+ansible_inventory.py querygroup --dbuser ansible --dbpassword ansible --group mixed-nodes
 ````
 ````
 [
-  {
-    "ansible_hostname": "node1",
-    "ansible_ssh_host": "172.28.128.56",
-    "group_names": "test-nodes",
-    "inventory_hostname": "node1"
-  },
-  {
-    "ansible_hostname": "node2",
-    "ansible_ssh_host": "172.28.128.57",
-    "group_names": "test-nodes",
-    "inventory_hostname": "node2"
-  },
-  {
-    "ansible_hostname": "node3",
-    "ansible_ssh_host": "172.28.128.58",
-    "group_names": "test-nodes",
-    "inventory_hostname": "node3"
-  }
+    {
+        "ansible_hostname": "node1",
+        "ansible_ssh_host": "172.28.128.10",
+        "inventory_hostname": "node1",
+        "group_names": "mixed-nodes"
+    },
+    {
+        "ansible_hostname": "node4",
+        "ansible_ssh_host": "172.28.128.13",
+        "inventory_hostname": "node4",
+        "group_names": "mixed-nodes"
+    }
 ]
 ````
 Query a specific host...
 ````
-ansible_inventory.py --user ansible --password ansible --queryhost node1
+ansible_inventory.py queryhost --dbuser ansible --dbpassword ansible --host node1
 ````
 ````
 [
-  {
-    "ansible_hostname": "node1",
-    "ansible_ssh_host": "172.28.128.56",
-    "group_names": "mixed-nodes",
-    "inventory_hostname": "node1"
-  },
-  {
-    "ansible_hostname": "node1",
-    "ansible_ssh_host": "172.28.128.56",
-    "group_names": "test-nodes",
-    "inventory_hostname": "node1"
-  }
+    {
+        "ansible_hostname": "node1",
+        "ansible_ssh_host": "172.28.128.10",
+        "inventory_hostname": "node1",
+        "group_names": "all"
+    },
+    {
+        "ansible_hostname": "node1",
+        "ansible_ssh_host": "172.28.128.10",
+        "inventory_hostname": "node1",
+        "group_names": "mixed-nodes"
+    },
+    {
+        "ansible_hostname": "node1",
+        "ansible_ssh_host": "172.28.128.10",
+        "inventory_hostname": "node1",
+        "group_names": "renamed-nodes"
+    }
 ]
 ````
 Query a specific host for all details...
 ````
-ansible_inventory.py --user ansible --password ansible --queryhostdetails node1
+ansible_inventory.py queryhostdetails --dbuser ansible --dbpassword ansible --host node1
 ````
 ````
 [
-  {
-    "HostDetailsId": 2,
-    "HostId": 2,
-    "LastUpdateTime": "2016-05-25T18:01:07",
-    "ansible_architecture": "x86_64",
-    "ansible_bios_date": "12/01/2006",
-    "ansible_bios_version": "VirtualBox",
-    "ansible_date_time.tz": "EDT",
-    "ansible_default_ipv4.address": "10.0.2.15",
-    "ansible_default_ipv4.gateway": "10.0.2.2",
-    "ansible_default_ipv4.interface": "eth0",
-    "ansible_default_ipv4.macaddress": "08:00:27:a0:a8:23",
-    "ansible_default_ipv4.netmask": "255.255.255.0",
-    "ansible_distribution": "Debian",
-    "ansible_distribution_release": "jessie",
-    "ansible_distribution_version": "8.3",
-    "ansible_fqdn": "node1",
-    "ansible_hostname": "node1",
-    "ansible_kernel": "3.16.0-4-amd64",
-    "ansible_memfree_mb": 78,
-    "ansible_memtotal_mb": 494,
-    "ansible_nodename": "node1",
-    "ansible_os_family": "Debian",
-    "ansible_processor": "GenuineIntelIntel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz",
-    "ansible_processor_cores": 1,
-    "ansible_processor_count": 1,
-    "ansible_product_name": "VirtualBox",
-    "ansible_ssh_host": "172.28.128.56",
-    "ansible_swapfree_mb": 1020,
-    "ansible_swaptotal_mb": 1020,
-    "ansible_system_vendor": "innotek GmbH",
-    "ansible_virtualization_type": "virtualbox"
-  }
+    {
+        "ansible_default_ipv4.macaddress": "08:00:27:55:7c:f9",
+        "ansible_distribution_version": "14.04",
+        "ansible_virtualization_type": "virtualbox",
+        "ansible_processor_cores": 1,
+        "ansible_default_ipv4.interface": "eth0",
+        "ansible_default_ipv4.gateway": "10.0.2.2",
+        "ansible_bios_version": "VirtualBox",
+        "ansible_processor": "GenuineIntelIntel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz",
+        "ansible_default_ipv4.netmask": "255.255.255.0",
+        "ansible_memtotal_mb": 489,
+        "ansible_architecture": "x86_64",
+        "ansible_ssh_host": "172.28.128.10",
+        "ansible_swapfree_mb": 510,
+        "HostDetailsId": 3,
+        "ansible_distribution_release": "trusty",
+        "ansible_system_vendor": "innotek GmbH",
+        "ansible_os_family": "Debian",
+        "ansible_swaptotal_mb": 511,
+        "ansible_product_name": "VirtualBox",
+        "ansible_memfree_mb": 95,
+        "ansible_distribution": "Ubuntu",
+        "HostId": 3,
+        "ansible_processor_count": 1,
+        "ansible_hostname": "node1",
+        "ansible_bios_date": "12/01/2006",
+        "ansible_date_time.tz": "EDT",
+        "LastUpdateTime": "2016-06-05T00:40:11",
+        "ansible_kernel": "4.2.0-30-generic",
+        "ansible_fqdn": "node1",
+        "ansible_default_ipv4.address": "10.0.2.15",
+        "ansible_nodename": "node1"
+    }
 ]
 ````
 
