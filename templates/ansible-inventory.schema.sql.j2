@@ -8,7 +8,6 @@ CREATE TABLE `Groups` (
   `group_names` varchar(255) NOT NULL,
   `GroupDescription` varchar(255) DEFAULT NULL,
   `GroupDTAP` char(1) DEFAULT '',
-  `GroupCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`GroupId`),
   UNIQUE KEY `group_names` (`group_names`)
@@ -23,7 +22,6 @@ CREATE TABLE `Hosts` (
   `HostId` int(11) NOT NULL AUTO_INCREMENT,
   `inventory_hostname` varchar(255) NOT NULL,
   `HostDescription` varchar(255) DEFAULT NULL,
-  `HostCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`HostId`),
   UNIQUE KEY `inventory_hostname` (`inventory_hostname`)
@@ -54,7 +52,6 @@ CREATE TABLE `GroupContact` (
   `ContactName` varchar(255) NOT NULL,
   `ContactEmail` varchar(255) NOT NULL,
   `ContactPhone` varchar(255) NOT NULL,
-  `ContactCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `GroupId` int(11) NOT NULL,
   `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`ContactId`),
