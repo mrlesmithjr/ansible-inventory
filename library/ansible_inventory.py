@@ -25,28 +25,77 @@ class AnsibleMySQL(object):
     def __init__(self):
         self.read_cli_args()
         self.process_cli_args()
-        self.gather_inventory()
-        self.process_results()
+        try:
+            self.db_connection()
+            if self.args.action != "addhost":
+                self.gather_inventory()
+                self.process_results()
+            elif self.args.action == "addhost":
+                self.add_host()
+        finally:
+            self.db_close_connection()
+
+    def db_close_connection(self):
+        """
+        Close DB connection(s)
+        """
+        self.cur.close()
+        self.con.close()
+
+    def db_connection(self):
+        """
+        Initiate DB connection and execute SQL code
+        """
+        self.con = MySQLdb.connect(self.args.dbhost, self.args.dbuser,
+                                   self.args.dbpassword, self.args.dbname)
+        self.cur = self.con.cursor()
 
     def gather_inventory(self):
         """
         Gather inventory from MySQL based on query
         """
-        try:
-            self.con = MySQLdb.connect(self.args.dbhost, self.args.dbuser,
-                                       self.args.dbpassword, self.args.dbname)
-            self.cur = self.con.cursor()
-            self.cur.execute(self.sql)
-            self.rows = self.cur.fetchall()
-        finally:
-            self.cur.close()
-            self.con.close()
+        self.cur.execute(self.sql)
+        self.rows = self.cur.fetchall()
+
+    def add_host(self):
+        """
+        Add host to inventory
+
+        Requires defining hostname/group/sshhost when adding..
+        --host
+        --group
+        --sshhost
+        """
+        self.cur.execute(self.sql1)
+        self.cur.execute(self.sql2)
+        self.cur.execute(self.sql3)
+        self.con.commit()
 
     def process_cli_args(self):
         """
         Process command-line cli arguments passed
         """
-        if self.args.action == "queryall":
+        if self.args.action == 'addhost':
+            self.sql1 = """
+                INSERT IGNORE INTO `ansible_inventory`.`Hosts`
+                (`inventory_hostname`)
+                VALUES
+                ('%s')
+                """ % self.args.host
+            self.sql2 = """
+                REPLACE INTO `ansible_inventory`.`HostVars`
+                (`HostId`,`VarName`,`VarValue`)
+                VALUES
+                ((SELECT HostID FROM `Hosts` WHERE inventory_hostname='%s'), 'ansible_ssh_host', '%s')
+                """ % (self.args.host, self.args.sshhost)
+            self.sql3 = """
+                INSERT IGNORE INTO `ansible_inventory`.`HostGroups`
+                (`HostId`,`GroupId`,`inventory_hostname`,`group_names`)
+                VALUES
+                ((SELECT HostId FROM `Hosts` WHERE inventory_hostname='%s'),(SELECT GroupId FROM Groups WHERE group_names='%s'),
+                '%s','%s')
+                """ % (self.args.host, self.args.group, self.args.host, self.args.group)
+        elif self.args.action == "queryall":
             self.sql = """
                 SELECT h.inventory_hostname, hg.group_names, hd.*
                 FROM
@@ -114,7 +163,7 @@ class AnsibleMySQL(object):
         """
         parser = argparse.ArgumentParser(description='Ansible Inventory...')
         parser.add_argument('action', help='Define action to take',
-                            choices=['queryall', 'queryallgroups', 'queryallhosts',
+                            choices=['addhost', 'queryall', 'queryallgroups', 'queryallhosts',
                                      'querygroup', 'queryhost', 'queryhostdetails'])
         parser.add_argument('--dbhost', default='127.0.0.1',
                             help='Database Host, [default: 127.0.0.1]')
@@ -125,7 +174,12 @@ class AnsibleMySQL(object):
         parser.add_argument('--dbuser', required=True, help='Database User')
         parser.add_argument('--group', help='Query Group, Define Group to Query')
         parser.add_argument('--host', help='Query Host, Define Host to Query')
+        parser.add_argument('--sshhost',
+                            help='Define Ansible SSH Host IP/Hostname when adding A new host')
         self.args = parser.parse_args()
+        if self.args.action == "addhost" and (self.args.host is None or
+                                              self.args.group is None or self.args.sshhost is None):
+            parser.error("--host, --group and --sshhost are required when adding a new host")
         if (self.args.action == "queryhost" or
                 self.args.action == "queryhostdetails") and self.args.host is None:
             parser.error("--host is required")
