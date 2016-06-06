@@ -24,6 +24,28 @@ class AnsibleMySQL(object):
     """
     def __init__(self):
         self.read_cli_args()
+        self.process_cli_args()
+        self.gather_inventory()
+        self.process_results()
+
+    def gather_inventory(self):
+        """
+        Gather inventory from MySQL based on query
+        """
+        try:
+            self.con = MySQLdb.connect(self.args.dbhost, self.args.dbuser,
+                                       self.args.dbpassword, self.args.dbname)
+            self.cur = self.con.cursor()
+            self.cur.execute(self.sql)
+            self.rows = self.cur.fetchall()
+        finally:
+            self.cur.close()
+            self.con.close()
+
+    def process_cli_args(self):
+        """
+        Process command-line cli arguments passed
+        """
         if self.args.action == "queryall":
             self.sql = """
                 SELECT h.inventory_hostname, hg.group_names, hd.*
@@ -74,22 +96,6 @@ class AnsibleMySQL(object):
                 HostDetails AS hd, Hosts AS h, HostGroups AS hg
                 WHERE h.HostId = hd.HostId AND h.HostId = hg.HostId
                 """
-        self.gather_inventory()
-        self.process_results()
-
-    def gather_inventory(self):
-        """
-        Gather inventory from MySQL based on query
-        """
-        try:
-            self.con = MySQLdb.connect(self.args.dbhost, self.args.dbuser,
-                                       self.args.dbpassword, self.args.dbname)
-            self.cur = self.con.cursor()
-            self.cur.execute(self.sql)
-            self.rows = self.cur.fetchall()
-        finally:
-            self.cur.close()
-            self.con.close()
 
     def process_results(self):
         """
