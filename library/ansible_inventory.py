@@ -35,6 +35,21 @@ class AnsibleMySQL(object):
         finally:
             self.db_close_connection()
 
+    def add_host(self):
+        """
+        Add host to inventory
+
+        Requires defining hostname/group/sshhost when adding..
+        --host
+        --group
+        --sshhost
+        """
+        self.cur.execute(self.sql1)
+        self.cur.execute(self.sql2)
+        self.cur.execute(self.sql3)
+        self.cur.execute(self.sql4)
+        self.con.commit()
+
     def db_close_connection(self):
         """
         Close DB connection(s)
@@ -57,20 +72,6 @@ class AnsibleMySQL(object):
         self.cur.execute(self.sql)
         self.rows = self.cur.fetchall()
 
-    def add_host(self):
-        """
-        Add host to inventory
-
-        Requires defining hostname/group/sshhost when adding..
-        --host
-        --group
-        --sshhost
-        """
-        self.cur.execute(self.sql1)
-        self.cur.execute(self.sql2)
-        self.cur.execute(self.sql3)
-        self.con.commit()
-
     def process_cli_args(self):
         """
         Process command-line cli arguments passed
@@ -89,6 +90,12 @@ class AnsibleMySQL(object):
                 ((SELECT HostID FROM `Hosts` WHERE inventory_hostname='%s'), 'ansible_ssh_host', '%s')
                 """ % (self.args.host, self.args.sshhost)
             self.sql3 = """
+                INSERT IGNORE INTO `ansible_inventory`.`Groups`
+                (`group_names`)
+                VALUES
+                ('%s')
+                """ % (self.args.group)
+            self.sql4 = """
                 INSERT IGNORE INTO `ansible_inventory`.`HostGroups`
                 (`HostId`,`GroupId`,`inventory_hostname`,`group_names`)
                 VALUES
