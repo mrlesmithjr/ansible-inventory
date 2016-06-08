@@ -117,6 +117,14 @@ Example Playbook
     - role: ansible-inventory
   tasks:
 ````
+
+Docker
+------
+You can run the Ansible Inventory system within a Docker container by...
+````
+docker run -d -p 3306:3306 --name ansible-inventory mrlesmithjr/ansible-inventory
+````
+
 Example Ansible playbook execution
 ----------------------------------
 Using the included python script (library/ansible_play.py) you can  
