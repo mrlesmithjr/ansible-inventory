@@ -31,27 +31,42 @@ Requirements
 ------------
 
 Install required Ansible roles...  
-````
+```
 ansible-galaxy install -r requirements.yml
-````
+```
 
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-inventory
-inventory_db_name: 'ansible_inventory'  #Defines the Inventory DB Name
-inventory_db_host: 'node0'  #Defines the inventory_hostname in which the Inventory DB is to reside
-inventory_db_host_access:  #Defines the Host Access to the DB User
+
+# Defines the Inventory DB Name
+inventory_db_name: 'ansible_inventory'
+
+# Defines the inventory_hostname in which the Inventory DB is to reside
+inventory_db_host: 'node0'
+
+# Defines the Host Access to the DB User
+inventory_db_host_access:
   - '127.0.0.1'
   - 'localhost'
   - '::1'
   - '{{ ansible_hostname }}'
   - '%'
-inventory_db_user: 'ansible'  #Defines the Inventory DB User Name
-inventory_db_password: 'ansible'  #Defines the Inventory DB User Password
-inventory_group_vars:  #Define specific Ansible group vars to add
+
+# Defines the Inventory DB User Name
+inventory_db_user: 'ansible'
+
+# Defines the Inventory DB User Password
+inventory_db_password: 'ansible'
+
+# Defines if gather details task should run
+inventory_gather_details: false
+
+# Define specific Ansible group vars to add
+inventory_group_vars:
   - group: 'all'
     vars:
       - name: 'pri_domain_name'
@@ -68,11 +83,16 @@ inventory_group_vars:  #Define specific Ansible group vars to add
         value: 'true'
       - name: 'mysql_root_password'
         value: 'root'
-inventory_groups:  #Define specific Ansible groups to define...All groups are discovered and added during scans as well
+
+# Define specific Ansible groups to define
+# All groups are discovered and added during scans as well
+inventory_groups:
   - 'db-nodes'
   - 'elk-nodes'
   - 'openstack-nodes'
-inventory_host_vars:  #Define any specific hostvars to add
+
+# Define any specific hostvars to add
+inventory_host_vars:
   - host: 'node0'
     vars:
       - name: 'ansiblevar'
@@ -83,12 +103,14 @@ inventory_host_vars:  #Define any specific hostvars to add
     vars:
       - name: 'es_packetbeat_interface'
         value: 'any'
-inventory_hosts:  #Define hosts to be added to the inventory (ip is optional-if DNS works)
+
+#Define hosts to be added to the inventory (ip is optional-if DNS works)
+inventory_hosts:
   - name: 'test-node-01'
     ip: '192.168.202.201'
   - name: 'test-node-02'
     ip: '192.168.202.202'
-````
+```
 
 Dependencies
 ------------
@@ -97,7 +119,7 @@ None
 
 Example Playbook
 ----------------
-````
+```
 - hosts: db-nodes
   become: true
   vars:
@@ -116,30 +138,30 @@ Example Playbook
   roles:
     - role: ansible-inventory
   tasks:
-````
+```
 
 Docker
 ------
 You can run the Ansible Inventory system within a Docker container by...
-````
+```
 docker run -d -p 3306:3306 --name ansible-inventory mrlesmithjr/ansible-inventory
-````
+```
 To run the examples below within the Docker container you can replace the commands  
 as such...  
 Adding a new host...
-````
+```
 docker exec -it ansible-inventory /etc/ansible/roles/ansible-inventory/library/ansible_inventory.py --dbuser ansible --dbpassword ansible addhost --host smtp --group smtp-servers --sshhost="10.0.102.128"
-````
+```
 Ansible playbook executions...
-````
+```
 docker exec -it ansible-inventory ansible-playbook -i /etc/ansible/roles/ansible-inventory/library/ansible_play.py playbook.yml --list-hosts
-````
+```
 
 Example Ansible playbook execution
 ----------------------------------
 Using the included python script (library/ansible_play.py) you can  
 use the back-end DB for your dynamic inventory...
-````
+```
 ansible-playbook -i library/ansible_play.py playbook.yml --list-hosts
 
 playbook: playbook.yml
@@ -182,9 +204,9 @@ playbook: playbook.yml
       node3
       node2
       node4
-````
+```
 To view the contents of the dynamic inventory...
-````
+```
 ./library/ansible_play.py                                      
 {
   "all": {
@@ -269,22 +291,22 @@ To view the contents of the dynamic inventory...
     ]
   }
 }
-````
+```
 
 Example Queries
 ---------------
 Using the included python script (library/ansible_inventory.py) to execute  
 queries.
 
-````
+```
 library/ansible_inventory.py
-````
+```
 
 Show script help..
-````
+```
 ansible_inventory.py -h
-````
-````
+```
+```
 usage: ansible_inventory.py [-h] [--dbhost DBHOST] [--dbname DBNAME]
                             --dbpassword DBPASSWORD --dbuser DBUSER
                             [--group GROUP] [--host HOST]
@@ -305,12 +327,12 @@ optional arguments:
   --dbuser DBUSER       Database User
   --group GROUP         Query Group, Define Group to Query
   --host HOST           Query Host, Define Host to Query
-````
+```
 Query all groups...
-````
+```
 ansible_inventory.py queryallgroups --dbuser ansible --dbpassword ansible
-````
-````
+```
+```
 [
     {
         "group_names": "all"
@@ -340,12 +362,12 @@ ansible_inventory.py queryallgroups --dbuser ansible --dbpassword ansible
         "group_names": "ungrouped"
     }
 ]
-````
+```
 Query all hosts...
-````
+```
 ansible_inventory.py queryallhosts --dbuser ansible --dbpassword ansible
-````
-````
+```
+```
 [
     {
         "inventory_hostname": "jumpbox"
@@ -375,12 +397,12 @@ ansible_inventory.py queryallhosts --dbuser ansible --dbpassword ansible
         "inventory_hostname": "test-node-02"
     }
 ]
-````
+```
 Query a specific group...
-````
+```
 ansible_inventory.py querygroup --dbuser ansible --dbpassword ansible --group mixed-nodes
-````
-````
+```
+```
 [
     {
         "ansible_hostname": "node1",
@@ -395,12 +417,12 @@ ansible_inventory.py querygroup --dbuser ansible --dbpassword ansible --group mi
         "group_names": "mixed-nodes"
     }
 ]
-````
+```
 Query a specific host...
-````
+```
 ansible_inventory.py queryhost --dbuser ansible --dbpassword ansible --host node1
-````
-````
+```
+```
 [
     {
         "ansible_hostname": "node1",
@@ -421,12 +443,12 @@ ansible_inventory.py queryhost --dbuser ansible --dbpassword ansible --host node
         "group_names": "renamed-nodes"
     }
 ]
-````
+```
 Query a specific host for all details...
-````
+```
 ansible_inventory.py queryhostdetails --dbuser ansible --dbpassword ansible --host node1
-````
-````
+```
+```
 [
     {
         "ansible_default_ipv4.macaddress": "08:00:27:55:7c:f9",
@@ -462,7 +484,7 @@ ansible_inventory.py queryhostdetails --dbuser ansible --dbpassword ansible --ho
         "ansible_nodename": "node1"
     }
 ]
-````
+```
 
 License
 -------
